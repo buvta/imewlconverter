@@ -223,13 +223,14 @@ jobs:
             ./src/ImeWlConverterCmd
 
       - name: Run Linux integration tests
+        if: matrix.arch == 'x64'
         run: make integration-test
 
       - name: Upload Linux test reports
-        if: always()
+        if: always() && matrix.arch == 'x64'
         uses: actions/upload-artifact@v7
         with:
-          name: linux-integration-test-reports-${{ matrix.arch }}
+          name: linux-integration-test-reports
           path: tests/integration/reports/test-results.xml
           retention-days: 30
 
@@ -296,13 +297,14 @@ jobs:
             --output ./publish/${{ matrix.runtime }}/gui
 
       - name: Run macOS integration tests
+        if: matrix.arch == 'arm64'
         run: make integration-test
 
       - name: Upload macOS test reports
-        if: always()
+        if: always() && matrix.arch == 'arm64'
         uses: actions/upload-artifact@v7
         with:
-          name: macos-integration-test-reports-${{ matrix.arch }}
+          name: macos-integration-test-reports
           path: tests/integration/reports/test-results.xml
           retention-days: 30
 
