@@ -16,34 +16,30 @@
  */
 
 //using System;
-//using NUnit.Framework;
+//using Xunit;
 //using Studyzy.IMEWLConverter.Entities;
 //using Studyzy.IMEWLConverter.IME;
 
 //namespace Studyzy.IMEWLConverter.Test
 //{
-//    [TestFixture]
-//    internal class SougouPinyinBinTest : BaseTest
+//    public class SougouPinyinBinTest : BaseTest
 //    {
-//        [OneTimeSetUp]
-//        public override void InitData()
+//        public SougouPinyinBinTest()
 //        {
 //            importer = new SougouPinyinBinFromPython();
 //        }
-
+//
 //        protected override string StringData
 //        {
 //            get { throw new NotImplementedException(); }
 //        }
-
-//        [TestCase("sougoubak.bin")]
+//
+//        [Theory]
+//        [InlineData("sougoubak.bin")]
 //        public void TestParseBinFile(string filePath)
 //        {
 //            WordLibraryList lib = importer.Import(GetFullPath(filePath));
-//            Assert.That(lib.Count, Is.GreaterThan(0));
+//            Assert.True(lib.Count > 0);
 //        }
 //    }
 //}
-
-
-

@@ -16,7 +16,7 @@
  */
 
 using System.Diagnostics;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.Entities;
 using Studyzy.IMEWLConverter.IME;
 
@@ -24,7 +24,7 @@ namespace ImeWlConverterCoreTest;
 
 public class Win10MsPinyinSelfStudyTest
 {
-    [Test]
+    [Fact]
     public void TestExport1()
     {
         var wl = new WordLibraryList();

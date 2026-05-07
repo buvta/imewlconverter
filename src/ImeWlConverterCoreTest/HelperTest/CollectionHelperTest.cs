@@ -17,14 +17,14 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.Helpers;
 
 namespace Studyzy.IMEWLConverter.Test.HelperTest;
 
-internal class CollectionHelperTest
+public class CollectionHelperTest
 {
-    [Test]
+    [Fact]
     public void TestCartesianProduct1()
     {
         IList<IList<string>> list = new List<IList<string>>();
@@ -33,16 +33,16 @@ internal class CollectionHelperTest
         list.Add(new List<string> { "e", "f" });
         var result = CollectionHelper.CartesianProduct(list, ",");
         var array = result.ToArray();
-        Assert.That(array, Does.Contain("a,b,e"));
-        Assert.That(array, Does.Contain("a,b,f"));
-        Assert.That(array, Does.Contain("a,c,e"));
-        Assert.That(array, Does.Contain("a,c,f"));
-        Assert.That(array, Does.Contain("a,d,e"));
-        Assert.That(array, Does.Contain("a,d,f"));
-        Assert.That(6, Is.EqualTo(result.Count));
+        Assert.Contains("a,b,e", array);
+        Assert.Contains("a,b,f", array);
+        Assert.Contains("a,c,e", array);
+        Assert.Contains("a,c,f", array);
+        Assert.Contains("a,d,e", array);
+        Assert.Contains("a,d,f", array);
+        Assert.Equal(6, result.Count);
     }
 
-    [Test]
+    [Fact]
     public void TestCartesianProduct2()
     {
         IList<IList<string>> list = new List<IList<string>>();
@@ -51,8 +51,8 @@ internal class CollectionHelperTest
         list.Add(new List<string> { "e" });
         var result = CollectionHelper.CartesianProduct(list, ",");
         var array = result.ToArray();
-        Assert.That(array, Does.Contain("a,b,e"));
+        Assert.Contains("a,b,e", array);
 
-        Assert.That(1, Is.EqualTo(result.Count));
+        Assert.Equal(1, result.Count);
     }
 }

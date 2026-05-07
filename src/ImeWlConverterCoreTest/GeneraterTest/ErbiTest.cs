@@ -16,33 +16,30 @@
  */
 
 using System.Collections.Generic;
-using System.Diagnostics;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.Generaters;
 
 namespace Studyzy.IMEWLConverter.Test.GeneraterTest;
 
-internal class ErbiTest
+public class ErbiTest
 {
-    private IWordCodeGenerater generater;
+    private readonly IWordCodeGenerater generater;
 
-    [OneTimeSetUp]
-    public void SetUp()
+    public ErbiTest()
     {
         generater = new QingsongErbiGenerater();
     }
 
-    [TestCase("中国人民", "zgrm")]
-    [TestCase("中华人民共和国", "zhrg")]
+    [Theory]
+    [InlineData("中国人民", "zgrm")]
+    [InlineData("中华人民共和国", "zhrg")]
     public void TestOneWord(string c, string code)
     {
         var codes = generater.GetCodeOfString(c);
         foreach (var code1 in codes)
         {
-            Debug.WriteLine(code1[0]);
             if (code == code1[0])
             {
-                Assert.Pass("Pass");
                 return;
             }
         }
@@ -50,9 +47,8 @@ internal class ErbiTest
         Assert.Fail("not matched code," + c);
     }
 
-    [Test]
-    [Description("数据量太大，手动启动")]
-    [Explicit]
+    [Fact(Skip = "Large dataset test, run manually")]
+    [Trait("Category", "Explicit")]
     public void BatchTest()
     {
         //var txt = FileOperationHelper.ReadFile("erbi.txt");

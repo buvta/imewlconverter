@@ -1,12 +1,11 @@
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.Generaters;
 
 namespace Studyzy.IMEWLConverter.CoreTest.GeneraterTest;
 
-[TestFixture]
 public class LlmWordRankGeneraterTest
 {
-    [Test]
+    [Fact]
     public void TestParseRank()
     {
         var generater = new LlmWordRankGenerater();
@@ -20,10 +19,10 @@ public class LlmWordRankGeneraterTest
   ]
 }";
         var rank = generater.ParseRank(json);
-        Assert.That(rank, Is.EqualTo(850000));
+        Assert.Equal(850000, rank);
     }
 
-    [Test]
+    [Fact]
     public void TestParseRankRegex()
     {
         var generater = new LlmWordRankGenerater();
@@ -37,10 +36,10 @@ public class LlmWordRankGeneraterTest
   ]
 }";
         var rank = generater.ParseRank(json);
-        Assert.That(rank, Is.EqualTo(12345));
+        Assert.Equal(12345, rank);
     }
 
-    [Test]
+    [Fact]
     public void TestParseRanksJson()
     {
         var generater = new LlmWordRankGenerater();
@@ -54,11 +53,11 @@ public class LlmWordRankGeneraterTest
   ]
 }";
         var ranks = generater.ParseRanks(json);
-        Assert.That(ranks["苹果"], Is.EqualTo(850000));
-        Assert.That(ranks["香蕉"], Is.EqualTo(700000));
+        Assert.Equal(850000, ranks["苹果"]);
+        Assert.Equal(700000, ranks["香蕉"]);
     }
 
-    [Test]
+    [Fact]
     public void TestParseRanksRegex()
     {
         var generater = new LlmWordRankGenerater();
@@ -72,31 +71,31 @@ public class LlmWordRankGeneraterTest
   ]
 }";
         var ranks = generater.ParseRanks(json);
-        Assert.That(ranks["苹果"], Is.EqualTo(850000));
-        Assert.That(ranks["香蕉"], Is.EqualTo(700000));
+        Assert.Equal(850000, ranks["苹果"]);
+        Assert.Equal(700000, ranks["香蕉"]);
     }
 
-    [Test]
+    [Fact]
     public void TestGetFullApiEndpoint()
     {
         var generater = new LlmWordRankGenerater();
 
         generater.Config.ApiEndpoint = "https://api.deepseek.com";
-        Assert.That(generater.GetFullApiEndpoint(), Is.EqualTo("https://api.deepseek.com/v1/chat/completions"));
+        Assert.Equal("https://api.deepseek.com/v1/chat/completions", generater.GetFullApiEndpoint());
 
         generater.Config.ApiEndpoint = "https://api.deepseek.com/";
-        Assert.That(generater.GetFullApiEndpoint(), Is.EqualTo("https://api.deepseek.com/v1/chat/completions"));
+        Assert.Equal("https://api.deepseek.com/v1/chat/completions", generater.GetFullApiEndpoint());
 
         generater.Config.ApiEndpoint = "https://api.deepseek.com/v1";
-        Assert.That(generater.GetFullApiEndpoint(), Is.EqualTo("https://api.deepseek.com/v1/chat/completions"));
+        Assert.Equal("https://api.deepseek.com/v1/chat/completions", generater.GetFullApiEndpoint());
 
         generater.Config.ApiEndpoint = "https://api.deepseek.com/v1/";
-        Assert.That(generater.GetFullApiEndpoint(), Is.EqualTo("https://api.deepseek.com/v1/chat/completions"));
+        Assert.Equal("https://api.deepseek.com/v1/chat/completions", generater.GetFullApiEndpoint());
 
         generater.Config.ApiEndpoint = "https://api.deepseek.com/v1/chat/completions";
-        Assert.That(generater.GetFullApiEndpoint(), Is.EqualTo("https://api.deepseek.com/v1/chat/completions"));
+        Assert.Equal("https://api.deepseek.com/v1/chat/completions", generater.GetFullApiEndpoint());
 
         generater.Config.ApiEndpoint = "https://api.deepseek.com/v1/chat/completions/";
-        Assert.That(generater.GetFullApiEndpoint(), Is.EqualTo("https://api.deepseek.com/v1/chat/completions/"));
+        Assert.Equal("https://api.deepseek.com/v1/chat/completions/", generater.GetFullApiEndpoint());
     }
 }

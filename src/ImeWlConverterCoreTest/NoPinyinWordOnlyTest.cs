@@ -16,16 +16,14 @@
  */
 
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.IME;
 
 namespace Studyzy.IMEWLConverter.Test;
 
-[TestFixture]
 public class NoPinyinWordOnlyTest : BaseTest
 {
-    [OneTimeSetUp]
-    public override void InitData()
+    public NoPinyinWordOnlyTest()
     {
         importer = new NoPinyinWordOnly();
         exporter = new NoPinyinWordOnly();
@@ -34,31 +32,31 @@ public class NoPinyinWordOnlyTest : BaseTest
 
     protected override string StringData => Resource4Test.NoPinyinWordOnly;
 
-    [Test]
+    [Fact]
     public void TestExport()
     {
         var txt = exporter.Export(WlListData)[0];
-        Assert.That("深蓝测试\r\n词库转换\r\n", Is.EqualTo(txt));
+        Assert.Equal("深蓝测试\r\n词库转换\r\n", txt);
     }
 
-    [Test]
+    [Fact]
     public void TestExportLine()
     {
         var txt = exporter.ExportLine(WlData);
-        Assert.That("深蓝测试", Is.EqualTo(txt));
+        Assert.Equal("深蓝测试", txt);
     }
 
-    [Test]
+    [Fact]
     public void TestImport()
     {
         var wl = ((IWordLibraryTextImport)importer).ImportText(StringData);
-        Assert.That(10, Is.EqualTo(wl.Count));
+        Assert.Equal(10, wl.Count);
     }
 
-    [Test]
+    [Fact]
     public void TestImportFile()
     {
         var wll = importer.Import(GetFullPath("纯汉字.txt"));
-        Assert.That(wll.Count, Is.GreaterThan(0));
+        Assert.True(wll.Count > 0);
     }
 }

@@ -19,22 +19,20 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.Entities;
 using Studyzy.IMEWLConverter.IME;
 
 namespace Studyzy.IMEWLConverter.Test;
 
-[TestFixture]
 public class SelfDefiningTest
 {
     //private SelfDefining selfDefining;
-    //[OneTimeSetUp]
-    //public void Init()
+    //public SelfDefiningTest()
     //{
     //    selfDefining=new SelfDefining();
     //}
-    [Test]
+    [Fact]
     public void TestPinyinString2WL()
     {
         var parser = new ParsePattern
@@ -52,12 +50,12 @@ public class SelfDefiningTest
         selfDefining.UserDefiningPattern = parser;
         var wl = selfDefining.ImportLine(str)[0];
 
-        Assert.That("shen", Is.EqualTo(wl.Codes[0][0]));
-        Assert.That("lan", Is.EqualTo(wl.Codes[1][0]));
-        Assert.That(1, Is.EqualTo(wl.Rank));
+        Assert.Equal("shen", wl.Codes[0][0]);
+        Assert.Equal("lan", wl.Codes[1][0]);
+        Assert.Equal(1, wl.Rank);
     }
 
-    [Test]
+    [Fact]
     public void TestWordLibrary2String()
     {
         var parser = new ParsePattern
@@ -83,10 +81,10 @@ public class SelfDefiningTest
         var selfDefining = new SelfDefining();
         selfDefining.UserDefiningPattern = parser;
         var str = selfDefining.ExportLine(wl);
-        Assert.That("深蓝|,shen,lan,|123", Is.EqualTo(str));
+        Assert.Equal("深蓝|,shen,lan,|123", str);
     }
 
-    [Test]
+    [Fact]
     public void TestGeneratePinyinThen2String()
     {
         var parser = new ParsePattern
@@ -115,7 +113,7 @@ public class SelfDefiningTest
         var selfDefining = new SelfDefining();
         selfDefining.UserDefiningPattern = parser;
         var str = selfDefining.Export(wll);
-        Assert.That("深蓝|~sn~ln~|123\r", Is.EqualTo(str[0]));
+        Assert.Equal("深蓝|~sn~ln~|123\r", str[0]);
     }
 
     private WordLibrary WlData
@@ -132,7 +130,7 @@ public class SelfDefiningTest
         }
     }
 
-    [Test]
+    [Fact]
     public void TestExportPinyinDifferentFormatWL()
     {
         var p = new ParsePattern();
@@ -146,13 +144,11 @@ public class SelfDefiningTest
         var selfDefining = new SelfDefining();
 
         selfDefining.UserDefiningPattern = p;
-        Console.WriteLine("CodeType:" + selfDefining.UserDefiningPattern.CodeType);
         var str1 = selfDefining.Export(new WordLibraryList { WlData });
-        Console.WriteLine(str1[0]);
-        Assert.That("深蓝测试$shen_lan_ce_shi\r\n", Is.EqualTo(str1[0]));
+        Assert.Equal("深蓝测试$shen_lan_ce_shi\r\n", str1[0]);
     }
 
-    [Test]
+    [Fact]
     public void TestExportExtCodeWL()
     {
         var selfDefining = new SelfDefining();
@@ -160,10 +156,9 @@ public class SelfDefiningTest
         selfDefining.UserDefiningPattern.MappingTablePath = "./Test/array30.txt";
         var str = selfDefining.Export(new WordLibraryList { WlData });
         Debug.WriteLine(str);
-        //Assert.That(str, Is.Not.Null.And.Not.Empty);
     }
 
-    //[Test]
+    //[Fact]
     //public void TestWLWithoutPinyinExportException()
     //{
     //    export.UserDefiningPattern = InitPattern();
@@ -171,7 +166,7 @@ public class SelfDefiningTest
     //    Debug.WriteLine(str);
     //    Assert.IsNullOrEmpty(str);
     //}
-    [Test]
+    [Fact]
     public void TestExportExtCodeLots()
     {
         var str = "深蓝词库转换测试代码";
@@ -195,10 +190,10 @@ public class SelfDefiningTest
         selfDefining.UserDefiningPattern.MappingTablePath = "./Test/array30.txt";
         var x = selfDefining.Export(list);
         Debug.WriteLine(x);
-        Assert.That(str, Is.Not.Null);
+        Assert.NotNull(str);
     }
 
-    [Test]
+    [Fact]
     public void TestImportTxt()
     {
         var txt = "深藍 shen,lan 12345";
@@ -214,7 +209,7 @@ public class SelfDefiningTest
 
         var x = selfDefining.ImportLine(txt);
         Debug.WriteLine(x[0].ToString());
-        Assert.That("深藍", Is.EqualTo(x[0].Word));
+        Assert.Equal("深藍", x[0].Word);
     }
 
     private ParsePattern InitPattern()

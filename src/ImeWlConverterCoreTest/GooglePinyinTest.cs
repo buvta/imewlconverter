@@ -16,16 +16,14 @@
  */
 
 using System;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.IME;
 
 namespace Studyzy.IMEWLConverter.Test;
 
-[TestFixture]
-internal class GooglePinyinTest : BaseTest
+public class GooglePinyinTest : BaseTest
 {
-    [OneTimeSetUp]
-    public override void InitData()
+    public GooglePinyinTest()
     {
         exporter = new GooglePinyin();
         importer = new GooglePinyin();
@@ -33,25 +31,25 @@ internal class GooglePinyinTest : BaseTest
 
     protected override string StringData => Resource4Test.GooglePinyin;
 
-    [Test]
+    [Fact]
     public void TestExport()
     {
         var txt = exporter.Export(WlListData)[0];
-        Assert.That(txt.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).Length == 2, Is.True);
+        Assert.True(txt.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).Length == 2);
     }
 
-    [Test]
+    [Fact]
     public void TestExportLine()
     {
         var txt = exporter.ExportLine(WlData);
-        Assert.That("深蓝测试\t10\tshen lan ce shi", Is.EqualTo(txt));
+        Assert.Equal("深蓝测试\t10\tshen lan ce shi", txt);
     }
 
-    [Test]
+    [Fact]
     public void TestImport()
     {
         var list = ((IWordLibraryTextImport)importer).ImportText(StringData);
-        Assert.That(list, Is.Not.Null);
-        Assert.That(10, Is.EqualTo(list.Count));
+        Assert.NotNull(list);
+        Assert.Equal(10, list.Count);
     }
 }

@@ -17,15 +17,15 @@
 
 using System;
 using System.Diagnostics;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.IME;
 
 namespace Studyzy.IMEWLConverter.Test;
 
-internal class PerformanceTest
+public class PerformanceTest
 {
-    [Test]
-    [Explicit]
+    [Fact(Skip = "Performance test, run manually")]
+    [Trait("Category", "Explicit")]
     public void TestLoadHugeNumberWL()
     {
         Debug.WriteLine("Start:" + DateTime.Now);

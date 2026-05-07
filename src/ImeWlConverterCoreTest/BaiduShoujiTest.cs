@@ -16,16 +16,14 @@
  */
 
 using System;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.IME;
 
 namespace Studyzy.IMEWLConverter.Test;
 
-[TestFixture]
 public class BaiduShoujiTest : BaseTest
 {
-    [OneTimeSetUp]
-    public override void InitData()
+    public BaiduShoujiTest()
     {
         exporter = new BaiduShouji();
         importer = new BaiduShouji();
@@ -33,7 +31,7 @@ public class BaiduShoujiTest : BaseTest
 
     protected override string StringData => throw new NotImplementedException();
 
-    [Test]
+    [Fact]
     public void TestExport()
     {
     }

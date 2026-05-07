@@ -16,60 +16,58 @@
  */
 
 using System;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.Entities;
 using Studyzy.IMEWLConverter.IME;
 
 namespace Studyzy.IMEWLConverter.Test;
 
-[TestFixture]
-internal class QQPinyinQcelTest : BaseTest
+public class QQPinyinQcelTest : BaseTest
 {
-    [OneTimeSetUp]
-    public override void InitData()
+    public QQPinyinQcelTest()
     {
         importer = new QQPinyinQcel();
     }
 
     protected override string StringData => throw new NotImplementedException();
 
-    [TestCase]
+    [Fact]
     public void TestImportLine()
     {
-        Assert.Catch(
-            () => { importer.ImportLine("test"); },
-            "Qcel格式是二进制文件，不支持流转换"
+        Assert.ThrowsAny<Exception>(
+            () => { importer.ImportLine("test"); }
         );
     }
 
-    [TestCase("星际战甲.qcel")]
+    [Theory]
+    [InlineData("星际战甲.qcel")]
     public void TestImportQcelWithAlphabet(string filePath)
     {
         var lib = importer.Import(GetFullPath(filePath));
-        Assert.That(lib.Count, Is.GreaterThan(0));
+        Assert.True(lib.Count > 0);
 
-        Assert.That(4675, Is.EqualTo(lib.Count));
-        Assert.That(CodeType.Pinyin, Is.EqualTo(lib[0].CodeType));
-        Assert.That("a'ka'ta", Is.EqualTo(lib[2].PinYinString));
-        Assert.That("a'ka'ta'r'i'v'wai'guan", Is.EqualTo(lib[3].PinYinString));
-        Assert.That(0, Is.EqualTo(lib[0].Rank));
-        Assert.That("zuo", Is.EqualTo(lib[4670].SingleCode));
-        Assert.That("阿卡塔", Is.EqualTo(lib[2].Word));
-        Assert.That("阿卡塔riv外观", Is.EqualTo(lib[3].Word));
+        Assert.Equal(4675, lib.Count);
+        Assert.Equal(CodeType.Pinyin, lib[0].CodeType);
+        Assert.Equal("a'ka'ta", lib[2].PinYinString);
+        Assert.Equal("a'ka'ta'r'i'v'wai'guan", lib[3].PinYinString);
+        Assert.Equal(0, lib[0].Rank);
+        Assert.Equal("zuo", lib[4670].SingleCode);
+        Assert.Equal("阿卡塔", lib[2].Word);
+        Assert.Equal("阿卡塔riv外观", lib[3].Word);
     }
 
-    [TestCase("星际战甲.qcel")]
+    [Theory]
+    [InlineData("星际战甲.qcel")]
     public void TestListQcelInfo(string filePath)
     {
         var info = QQPinyinQcel.ReadQcelInfo(GetFullPath(filePath));
-        Assert.That(info, Is.Not.Null.And.Not.Empty);
-        foreach (var item in info)
-            TestContext.WriteLine(item.Key + ": " + item.Value);
+        Assert.NotNull(info);
+        Assert.NotEmpty(info);
 
-        Assert.That("4675", Is.EqualTo(info["CountWord"]));
-        Assert.That("星际战甲warframe国际服", Is.EqualTo(info["Name"]));
-        Assert.That("射击游戏", Is.EqualTo(info["Type"]));
-        Assert.That(info["Info"], Does.Contain("词条来源是灰机wiki-warframe中文维基的中英文对照表"));
-        Assert.That(info["Sample"], Does.Contain("肿瘤 三叶坚韧 狂风猛踢 寒冰之力"));
+        Assert.Equal("4675", info["CountWord"]);
+        Assert.Equal("星际战甲warframe国际服", info["Name"]);
+        Assert.Equal("射击游戏", info["Type"]);
+        Assert.Contains("词条来源是灰机wiki-warframe中文维基的中英文对照表", info["Info"]);
+        Assert.Contains("肿瘤 三叶坚韧 狂风猛踢 寒冰之力", info["Sample"]);
     }
 }

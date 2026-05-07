@@ -16,16 +16,14 @@
  */
 
 using System;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.IME;
 
 namespace Studyzy.IMEWLConverter.Test;
 
-[TestFixture]
-internal class SougouPinyinTest : BaseTest
+public class SougouPinyinTest : BaseTest
 {
-    [OneTimeSetUp]
-    public override void InitData()
+    public SougouPinyinTest()
     {
         importer = new SougouPinyin();
         exporter = new SougouPinyin();
@@ -33,7 +31,7 @@ internal class SougouPinyinTest : BaseTest
 
     protected override string StringData => throw new NotImplementedException();
 
-    [Test]
+    [Fact]
     public void TestImport()
     {
     }

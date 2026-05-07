@@ -1,4 +1,4 @@
-﻿/*
+/*
  *   Copyright © 2009-2020 studyzy(深蓝,曾毅)
 
  *   This program "IME WL Converter(深蓝词库转换)" is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
  */
 
 using System.IO;
-using NUnit.Framework;
+using System.Reflection;
 using Studyzy.IMEWLConverter.Entities;
 
 namespace Studyzy.IMEWLConverter.Test;
@@ -56,10 +56,9 @@ public abstract class BaseTest
         }
     }
 
-    public abstract void InitData();
-
     protected string GetFullPath(string fileName)
     {
-        return Path.Combine(TestContext.CurrentContext.TestDirectory, "Test", fileName);
+        var assemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        return Path.Combine(assemblyLocation!, "Test", fileName);
     }
 }

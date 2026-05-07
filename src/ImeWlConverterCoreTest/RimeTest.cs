@@ -16,16 +16,14 @@
  */
 
 using System;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.IME;
 
 namespace Studyzy.IMEWLConverter.Test;
 
-[TestFixture]
-internal class RimeTest : BaseTest
+public class RimeTest : BaseTest
 {
-    [OneTimeSetUp]
-    public override void InitData()
+    public RimeTest()
     {
         exporter = new Rime();
         importer = new Rime();
@@ -33,10 +31,11 @@ internal class RimeTest : BaseTest
 
     protected override string StringData => throw new NotImplementedException();
 
-    [TestCase("luna_pinyin_export.txt")]
+    [Theory]
+    [InlineData("luna_pinyin_export.txt")]
     public void TestImport(string path)
     {
         var wl = importer.Import(GetFullPath(path));
-        Assert.That(wl.Count, Is.GreaterThan(0));
+        Assert.True(wl.Count > 0);
     }
 }

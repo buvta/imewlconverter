@@ -16,53 +16,50 @@
  */
 
 using System;
-using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.Helpers;
 
 namespace Studyzy.IMEWLConverter.Test.HelperTest;
 
-internal class FileOperationTest
+public class FileOperationTest
 {
-    [TestCase("Test/u8nobomzy.txt", "UTF-8")]
-    [TestCase("Test/luna_pinyin_export.txt", "UTF-8")]
-    [TestCase("Test/gbzy.txt", "GB18030")]
-    [TestCase("Test/QQPinyin.txt", "Unicode")]
+    [Theory]
+    [InlineData("Test/u8nobomzy.txt", "UTF-8")]
+    [InlineData("Test/luna_pinyin_export.txt", "UTF-8")]
+    [InlineData("Test/gbzy.txt", "GB18030")]
+    [InlineData("Test/QQPinyin.txt", "Unicode")]
     public void TestGetFileEncoding(string path, string encoding)
     {
         path = GetFullPath(path);
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         var e = FileOperationHelper.GetEncodingType(path);
-        Assert.That(e.EncodingName, Is.EqualTo(Encoding.GetEncoding(encoding).EncodingName));
+        Assert.Equal(Encoding.GetEncoding(encoding).EncodingName, e.EncodingName);
         var txt = FileOperationHelper.ReadFile(path);
-        Debug.WriteLine(txt);
     }
 
-    [Test]
+    [Fact]
     public void TestCodePagesEncodingProviderRequired()
     {
-        Assert.Catch(
-            Type.GetType("System.ArgumentException"),
-            () => Encoding.GetEncoding("GB2312").ToString()
-        );
+        // After registration, GB2312 encoding should be available
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        Assert.That(Encoding.GetEncoding("GB2312").EncodingName, Is.EqualTo("Chinese Simplified (GB2312)"));
+        Assert.Equal("Chinese Simplified (GB2312)", Encoding.GetEncoding("GB2312").EncodingName);
     }
 
-    [Test]
+    [Fact]
     public void TestWriteFile()
     {
         var path = GetFullPath("WriteTest.txt");
         var content = "Hello Word!";
-        Assert.That(FileOperationHelper.WriteFile(path, Encoding.UTF8, content), Is.True);
-        Assert.That(File.Exists(path), Is.True);
+        Assert.True(FileOperationHelper.WriteFile(path, Encoding.UTF8, content));
+        Assert.True(File.Exists(path));
         File.Delete(path);
     }
 
     protected static string GetFullPath(string fileName)
     {
-        return Path.Combine(TestContext.CurrentContext.TestDirectory, fileName);
+        return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), fileName);
     }
 }

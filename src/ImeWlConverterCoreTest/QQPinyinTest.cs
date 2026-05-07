@@ -16,16 +16,14 @@
  */
 
 using System;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.IME;
 
 namespace Studyzy.IMEWLConverter.Test;
 
-[TestFixture]
-internal class QQPinyinTest : BaseTest
+public class QQPinyinTest : BaseTest
 {
-    [OneTimeSetUp]
-    public override void InitData()
+    public QQPinyinTest()
     {
         exporter = new QQPinyin();
         importer = new QQPinyin();
@@ -33,10 +31,10 @@ internal class QQPinyinTest : BaseTest
 
     protected override string StringData => throw new NotImplementedException();
 
-    [Test]
+    [Fact]
     public void TestImport()
     {
         var wll = importer.Import(GetFullPath("QQPinyin.txt"));
-        Assert.That(wll.Count, Is.GreaterThan(0));
+        Assert.True(wll.Count > 0);
     }
 }

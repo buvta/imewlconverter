@@ -16,34 +16,29 @@
  */
 
 using System;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.IME;
 
 namespace Studyzy.IMEWLConverter.Test;
 
-[TestFixture]
-internal class Ld2ParseTest : BaseTest
+public class Ld2ParseTest : BaseTest
 {
-    [OneTimeSetUp]
-    public override void InitData()
+    public Ld2ParseTest()
     {
         importer = new LingoesLd2();
     }
 
-    [TestCase("g.ld2")]
-    [TestCase("i.ld2")]
+    [Theory]
+    [InlineData("g.ld2")]
+    [InlineData("i.ld2")]
     public void TestParseLd2(string file)
     {
         var ld2File = GetFullPath(file);
 
         var reult = importer.Import(GetFullPath(ld2File));
 
-        Assert.That(reult, Is.Not.Null);
-        Assert.That(reult.Count, Is.GreaterThan(0));
-        //foreach (WordLibrary wordLibrary in reult)
-        //{
-        //    Debug.WriteLine(wordLibrary);
-        //}
+        Assert.NotNull(reult);
+        Assert.True(reult.Count > 0);
     }
 
     protected override string StringData => throw new NotImplementedException();

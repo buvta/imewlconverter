@@ -16,27 +16,26 @@
  */
 
 using System;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.IME;
 
 namespace Studyzy.IMEWLConverter.Test;
 
-[TestFixture]
-internal class BaiduBdictTest : BaseTest
+public class BaiduBdictTest : BaseTest
 {
-    [OneTimeSetUp]
-    public override void InitData()
+    public BaiduBdictTest()
     {
         importer = new BaiduPinyinBdict();
     }
 
     protected override string StringData => throw new NotImplementedException();
 
-    [TestCase("movie.bdict")]
+    [Theory]
+    [InlineData("movie.bdict")]
     public void TestImport(string file)
     {
         var wlList = importer.Import(GetFullPath(file));
-        Assert.That(wlList, Is.Not.Null);
-        Assert.That(wlList.Count, Is.GreaterThan(0));
+        Assert.NotNull(wlList);
+        Assert.True(wlList.Count > 0);
     }
 }

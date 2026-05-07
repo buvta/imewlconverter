@@ -15,17 +15,18 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.Helpers;
 
 namespace Studyzy.IMEWLConverter.Test.HelperTest;
 
-internal class HttpHelperTest
+public class HttpHelperTest
 {
-    [TestCase("http://www.baidu.com", "百度一下")]
+    [Theory]
+    [InlineData("http://www.baidu.com", "百度一下")]
     public void TestWriteFile(string url, string keyword)
     {
         var html = HttpHelper.GetHtml(url);
-        Assert.That(html, Does.Contain(keyword));
+        Assert.Contains(keyword, html);
     }
 }

@@ -17,14 +17,14 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.Generaters;
 
 namespace Studyzy.IMEWLConverter.Test.GeneraterTest;
 
-internal class SelfDefiningCodeGeneraterTest
+public class SelfDefiningCodeGeneraterTest
 {
-    [Test]
+    [Fact]
     public void TestGenerateCode()
     {
         var generater = new SelfDefiningCodeGenerater();
@@ -38,14 +38,14 @@ internal class SelfDefiningCodeGeneraterTest
 code_e3=p11+p21+p31+p32
 code_a4=p11+p21+p31+n11";
         var result = generater.GetCodeOfString("深蓝").GetTop1Code();
-        Assert.That("shla", Is.EqualTo(result));
+        Assert.Equal("shla", result);
         result = generater.GetCodeOfString("深深蓝").GetTop1Code();
-        Assert.That("ssla", Is.EqualTo(result));
+        Assert.Equal("ssla", result);
         result = generater.GetCodeOfString("深蓝深蓝").GetTop1Code();
-        Assert.That("slsl", Is.EqualTo(result));
+        Assert.Equal("slsl", result);
     }
 
-    [Test]
+    [Fact]
     public void TestGeneratePinyinFormatCode()
     {
         var generater = new SelfDefiningCodeGenerater();
@@ -55,13 +55,13 @@ code_a4=p11+p21+p31+n11";
 
         generater.Is1Char1Code = true;
         var result = generater.GetCodeOfString("深蓝").ToCodeString(",");
-        Assert.That("ipws,ajtl", Is.EqualTo(result[0]));
+        Assert.Equal("ipws,ajtl", result[0]);
 
         //var codes = generater.GetCodeOfString("蓝深", ",");
-        //Assert.That("ajtl,ipws", Is.EqualTo(codes[0]));
+        //Assert.Equal("ajtl,ipws", codes[0]);
     }
 
-    [Test]
+    [Fact]
     public void TestGenerateMutiPinyinFormatCode()
     {
         var generater = new SelfDefiningCodeGenerater();
@@ -71,9 +71,9 @@ code_a4=p11+p21+p31+n11";
 
         generater.Is1Char1Code = true;
         var result = generater.GetCodeOfString("深蓝").ToCodeString(",");
-        Assert.That(result.ToArray(), Does.Contain("ipws,ajtl"));
+        Assert.Contains("ipws,ajtl", result.ToArray());
 
         //var codes = generater.GetCodeOfString("蓝深", ",");
-        //Assert.That("ajtl,ipws", Is.EqualTo(codes[0]));
+        //Assert.Equal("ajtl,ipws", codes[0]);
     }
 }

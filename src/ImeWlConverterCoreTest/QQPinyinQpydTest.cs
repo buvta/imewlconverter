@@ -16,26 +16,25 @@
  */
 
 using System;
-using NUnit.Framework;
+using Xunit;
 using Studyzy.IMEWLConverter.IME;
 
 namespace Studyzy.IMEWLConverter.Test;
 
-[TestFixture]
-internal class QQPinyinQpydTest : BaseTest
+public class QQPinyinQpydTest : BaseTest
 {
-    [OneTimeSetUp]
-    public override void InitData()
+    public QQPinyinQpydTest()
     {
         importer = new QQPinyinQpyd();
     }
 
     protected override string StringData => throw new NotImplementedException();
 
-    [TestCase("成语.qpyd")]
+    [Theory]
+    [InlineData("成语.qpyd")]
     public void TestParseQypd(string file)
     {
         var wll = importer.Import(GetFullPath(file));
-        Assert.That(wll.Count, Is.GreaterThan(0));
+        Assert.True(wll.Count > 0);
     }
 }

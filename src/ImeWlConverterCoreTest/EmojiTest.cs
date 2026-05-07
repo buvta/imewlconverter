@@ -17,18 +17,18 @@
 
 using System;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 
 namespace ImeWlConverterCoreTest;
 
-internal class EmojiTest
+public class EmojiTest
 {
-    [Test]
+    [Fact]
     public void TestGenerateEmojiFile()
     {
         //var sw = FileOperationHelper.WriteFile("emoji.txt", Encoding.Unicode);
 
         var b = Encoding.UTF8.GetBytes("😀");
-        Console.WriteLine("Hex:{0:x}", b);
+        // Output: Hex bytes of emoji
     }
 }

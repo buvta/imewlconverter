@@ -17,9 +17,9 @@
 
 namespace Studyzy.IMEWLConverter.Test;
 
-internal class SelectedParsePatternTest
+public class SelectedParsePatternTest
 {
-    //        [Test]
+    //        [Fact]
     //        public void TestCodeString2WL()
     //        {
     //            ParsePattern parser = new ParsePattern()
@@ -38,7 +38,7 @@ internal class SelectedParsePatternTest
     //            parser.MappingTable.Add('深',"shen");
     //            parser.MappingTable.Add('蓝',"lan");
     //            var wl = parser.BuildWlString("深蓝");
-    //            Assert.That("深蓝 shla", Is.EqualTo(wl));
+    //            Assert.Equal("深蓝 shla", wl);
 
 
     //        }
