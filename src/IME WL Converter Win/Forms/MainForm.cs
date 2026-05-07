@@ -40,6 +40,7 @@ public partial class MainForm : Form
 
     //private int defaultRank = 10;
     protected string exportFileName;
+    private WordLibraryList binaryExportWordLibraryList;
     private string exportPath = "";
 
     //private bool isFolderBatchConvert = false;
@@ -532,7 +533,14 @@ public partial class MainForm : Form
             if (!streamExport)
                 try
                 {
-                    mainBody.Convert(files);
+                    if (export is IBinaryWordLibraryExport)
+                    {
+                        binaryExportWordLibraryList = mainBody.ConvertAndGetWordLibraryList(files);
+                    }
+                    else
+                    {
+                        mainBody.Convert(files);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -649,6 +657,11 @@ public partial class MainForm : Form
             {
                 saveFileDialog1.FileName = exportFileName;
             }
+            else if (export is IBinaryWordLibraryExport)
+            {
+                saveFileDialog1.DefaultExt = ".scel";
+                saveFileDialog1.Filter = "搜狗细胞词库|*.scel";
+            }
             else if (export is MsPinyin)
             {
                 saveFileDialog1.DefaultExt = ".dctx";
@@ -662,7 +675,15 @@ public partial class MainForm : Form
 
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                mainBody.ExportToFile(saveFileDialog1.FileName);
+                if (export is IBinaryWordLibraryExport binaryExport && binaryExportWordLibraryList != null)
+                {
+                    binaryExport.ExportToBinary(binaryExportWordLibraryList, saveFileDialog1.FileName);
+                    binaryExportWordLibraryList = null;
+                }
+                else
+                {
+                    mainBody.ExportToFile(saveFileDialog1.FileName);
+                }
 
                 ShowStatusMessage("保存成功，词库路径：" + saveFileDialog1.FileName, true);
             }
