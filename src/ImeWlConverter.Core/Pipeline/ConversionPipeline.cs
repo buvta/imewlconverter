@@ -13,22 +13,19 @@ public sealed class ConversionPipeline : IConversionPipeline
 {
     private readonly IEnumerable<IFormatImporter> _importers;
     private readonly IEnumerable<IFormatExporter> _exporters;
-    private readonly IProgressReporter? _progressReporter;
+    private readonly IProgress<ProgressInfo>? _progress;
 
     /// <summary>
     /// Initializes a new instance of <see cref="ConversionPipeline"/>.
     /// </summary>
-    /// <param name="importers">Available format importers.</param>
-    /// <param name="exporters">Available format exporters.</param>
-    /// <param name="progressReporter">Optional progress reporter for UI feedback.</param>
     public ConversionPipeline(
         IEnumerable<IFormatImporter> importers,
         IEnumerable<IFormatExporter> exporters,
-        IProgressReporter? progressReporter = null)
+        IProgress<ProgressInfo>? progress = null)
     {
         _importers = importers;
         _exporters = exporters;
-        _progressReporter = progressReporter;
+        _progress = progress;
     }
 
     /// <inheritdoc/>
@@ -50,7 +47,7 @@ public sealed class ConversionPipeline : IConversionPipeline
         foreach (var inputPath in request.InputPaths)
         {
             ct.ThrowIfCancellationRequested();
-            _progressReporter?.Report(new ProgressInfo(0, 0, $"Importing {Path.GetFileName(inputPath)}..."));
+            _progress?.Report(new ProgressInfo(0, 0, $"Importing {Path.GetFileName(inputPath)}..."));
 
             using var stream = File.OpenRead(inputPath);
             var importResult = await importer.ImportAsync(stream, request.Options.Import, ct);
@@ -59,12 +56,12 @@ public sealed class ConversionPipeline : IConversionPipeline
 
         var importedCount = allEntries.Count;
 
-        // 3. Filter pipeline (to be wired up with DI; pass-through for now)
+        // 3. Filter pipeline (to be wired up; pass-through for now)
         var exportedCount = allEntries.Count;
         var filteredCount = importedCount - exportedCount;
 
         // 4. Export
-        _progressReporter?.Report(new ProgressInfo(0, 0, "Exporting..."));
+        _progress?.Report(new ProgressInfo(0, 0, "Exporting..."));
         using var outputStream = File.Create(request.OutputPath);
         await exporter.ExportAsync(allEntries, outputStream, request.Options.Export, ct);
 
