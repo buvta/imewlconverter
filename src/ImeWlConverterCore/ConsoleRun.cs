@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Studyzy.IMEWLConverter.Entities;
@@ -341,7 +342,7 @@ public class ConsoleRun
     }
 
     private void PerformConversion(
-        List<string> inputFiles,
+        IReadOnlyList<string> inputFiles,
         string outputPath,
         IWordLibraryImport import,
         IWordLibraryExport export,
@@ -363,18 +364,18 @@ public class ConsoleRun
         // 二进制导出模式
         if (export is IBinaryWordLibraryExport binaryExport)
         {
-            var wlList = mainBody.ConvertAndGetWordLibraryList(inputFiles);
+            var wlList = mainBody.ConvertAndGetWordLibraryList(inputFiles.ToList());
             binaryExport.ExportToBinary(wlList, outputPath);
         }
         // 批量输出模式（输出路径以 / 结尾或为目录）
         else if (outputPath.EndsWith("/") || outputPath.EndsWith("\\"))
         {
-            mainBody.Convert(inputFiles, outputPath);
+            mainBody.Convert(inputFiles.ToList(), outputPath);
         }
         else
         {
             // 单文件输出模式
-            var str = mainBody.Convert(inputFiles);
+            var str = mainBody.Convert(inputFiles.ToList());
             FileOperationHelper.WriteFile(outputPath, export.Encoding, str);
         }
 

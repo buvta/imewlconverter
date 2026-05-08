@@ -22,82 +22,52 @@ using System.Collections.Generic;
 namespace Studyzy.IMEWLConverter;
 
 /// <summary>
-/// 命令行选项的强类型模型
+/// 命令行选项的强类型模型（不可变）
 /// </summary>
-public class CommandLineOptions
+public sealed record CommandLineOptions
 {
-    /// <summary>
-    /// 输入词库格式代码（如 scel, ggpy, qqpy）
-    /// </summary>
-    public string InputFormat { get; set; } = string.Empty;
+    /// <summary>输入词库格式代码（如 scel, ggpy, qqpy）</summary>
+    public required string InputFormat { get; init; }
 
-    /// <summary>
-    /// 输出词库格式代码（如 ggpy, rime, self）
-    /// </summary>
-    public string OutputFormat { get; set; } = string.Empty;
+    /// <summary>输出词库格式代码（如 ggpy, rime, self）</summary>
+    public required string OutputFormat { get; init; }
 
-    /// <summary>
-    /// 输出文件路径或目录路径
-    /// </summary>
-    public string OutputPath { get; set; } = string.Empty;
+    /// <summary>输出文件路径或目录路径</summary>
+    public required string OutputPath { get; init; }
 
-    /// <summary>
-    /// 输入文件路径列表（支持多文件）
-    /// </summary>
-    public List<string> InputFiles { get; set; } = new();
+    /// <summary>输入文件路径列表（支持多文件）</summary>
+    public required IReadOnlyList<string> InputFiles { get; init; }
 
-    /// <summary>
-    /// 编码映射文件路径（用于自定义编码）
-    /// </summary>
-    public string? CodeFile { get; set; }
+    /// <summary>编码映射文件路径（用于自定义编码）</summary>
+    public string? CodeFile { get; init; }
 
-    /// <summary>
-    /// 过滤条件字符串（如 "len:1-100|rm:eng"）
-    /// </summary>
-    public string? Filter { get; set; }
+    /// <summary>过滤条件字符串（如 "len:1-100|rm:eng"）</summary>
+    public string? Filter { get; init; }
 
-    /// <summary>
-    /// 自定义格式规范（如 "213, nyyn"）
-    /// </summary>
-    public string? CustomFormat { get; set; }
+    /// <summary>自定义格式规范（如 "213, nyyn"）</summary>
+    public string? CustomFormat { get; init; }
 
-    /// <summary>
-    /// 词频生成器类型（llm, 或固定数字）
-    /// </summary>
-    public string? RankGenerator { get; set; }
+    /// <summary>词频生成器类型（llm, 或固定数字）</summary>
+    public string? RankGenerator { get; init; }
 
-    /// <summary>
-    /// LLM API Endpoint
-    /// </summary>
-    public string? LlmEndpoint { get; set; }
+    /// <summary>LLM API Endpoint</summary>
+    public string? LlmEndpoint { get; init; }
 
-    /// <summary>
-    /// LLM API Key
-    /// </summary>
-    public string? LlmKey { get; set; }
+    /// <summary>LLM API Key</summary>
+    public string? LlmKey { get; init; }
 
-    /// <summary>
-    /// LLM Model Name
-    /// </summary>
-    public string? LlmModel { get; set; }
+    /// <summary>LLM Model Name</summary>
+    public string? LlmModel { get; init; }
 
-    /// <summary>
-    /// 多字词编码生成规则
-    /// </summary>
-    public string? MultiCode { get; set; }
+    /// <summary>多字词编码生成规则</summary>
+    public string? MultiCode { get; init; }
 
-    /// <summary>
-    /// 编码类型（pinyin, wubi, zhengma, cangjie, zhuyin）
-    /// </summary>
-    public string? CodeType { get; set; }
+    /// <summary>编码类型（pinyin, wubi, zhengma, cangjie, zhuyin）</summary>
+    public string? CodeType { get; init; }
 
-    /// <summary>
-    /// 目标操作系统（windows, macos, linux）
-    /// </summary>
-    public string? TargetOS { get; set; }
+    /// <summary>目标操作系统（windows, macos, linux）</summary>
+    public string? TargetOS { get; init; }
 
-    /// <summary>
-    /// Lingoes ld2 文件编码设置
-    /// </summary>
-    public string? Ld2Encoding { get; set; }
+    /// <summary>Lingoes ld2 文件编码设置</summary>
+    public string? Ld2Encoding { get; init; }
 }
