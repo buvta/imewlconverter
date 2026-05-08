@@ -9,16 +9,12 @@ using Studyzy.IMEWLConverter.IME;
 
 /// <summary>Sougou Pinyin scel cell dictionary importer (binary, delegates to legacy).</summary>
 [FormatPlugin("scel", "搜狗细胞词库scel", 20)]
-public sealed class SougouScelImporter : BinaryFormatImporter
+public sealed partial class SougouScelImporter : BinaryFormatImporter
 {
     static SougouScelImporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "scel", "搜狗细胞词库scel", 20, SupportsImport: true, SupportsExport: false, IsBinary: true);
-
     protected override IReadOnlyList<WordEntry> ParseBinary(Stream input, CancellationToken ct)
     {
         var tempFile = Path.GetTempFileName();

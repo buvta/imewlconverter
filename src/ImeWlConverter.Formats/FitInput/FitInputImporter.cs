@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>FIT Input dictionary importer (text format). Format: pinyin,word</summary>
 [FormatPlugin("fit", "FIT", 140)]
-public sealed class FitInputImporter : TextFormatImporter
+public sealed partial class FitInputImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => new UTF8Encoding(false);
-
-    public override FormatMetadata Metadata { get; } = new(
-        "fit", "FIT", 140, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var parts = line.Split(',');

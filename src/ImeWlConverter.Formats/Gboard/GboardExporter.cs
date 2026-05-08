@@ -7,14 +7,10 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Gboard dictionary exporter (tab-separated text format).</summary>
 [FormatPlugin("gboard", "Gboard", 111)]
-public sealed class GboardExporter : TextFormatExporter
+public sealed partial class GboardExporter : TextFormatExporter
 {
     protected override Encoding FileEncoding => new UTF8Encoding(false);
     protected override string LineEnding => "\n";
-
-    public override FormatMetadata Metadata { get; } = new(
-        "gboard", "Gboard", 111, SupportsImport: false, SupportsExport: true);
-
     protected override string? GetHeader() => "# Gboard Dictionary version:1";
 
     protected override string? FormatEntry(WordEntry entry)

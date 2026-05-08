@@ -9,16 +9,12 @@ using ImeWlConverter.Abstractions.Results;
 
 /// <summary>CangjiePlatform dictionary exporter (space-separated code+word, one code per line).</summary>
 [FormatPlugin("cjpt", "仓颉平台", 230)]
-public sealed class CangjiePlatformExporter : IFormatExporter
+public sealed partial class CangjiePlatformExporter : IFormatExporter
 {
     static CangjiePlatformExporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public FormatMetadata Metadata { get; } = new(
-        "cjpt", "仓颉平台", 230, SupportsImport: false, SupportsExport: true);
-
     public Task<ExportResult> ExportAsync(
         IReadOnlyList<WordEntry> entries, Stream output,
         ExportOptions? options = null, CancellationToken ct = default)

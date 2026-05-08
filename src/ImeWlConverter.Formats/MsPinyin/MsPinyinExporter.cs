@@ -9,10 +9,8 @@ using ImeWlConverter.Abstractions.Results;
 
 /// <summary>Microsoft Pinyin dictionary exporter (XML format).</summary>
 [FormatPlugin("mspy", "微软拼音", 135)]
-public sealed class MsPinyinExporter : IFormatExporter
+public sealed partial class MsPinyinExporter : IFormatExporter
 {
-    public FormatMetadata Metadata { get; } = new(
-        "mspy", "微软拼音", 135, SupportsImport: false, SupportsExport: true);
 
     public Task<ExportResult> ExportAsync(
         IReadOnlyList<WordEntry> entries, Stream output,

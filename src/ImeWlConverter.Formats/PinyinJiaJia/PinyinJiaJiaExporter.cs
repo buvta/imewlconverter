@@ -7,13 +7,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>PinyinJiaJia dictionary exporter (interleaved Chinese+pinyin format).</summary>
 [FormatPlugin("pyjj", "拼音加加", 120)]
-public sealed class PinyinJiaJiaExporter : TextFormatExporter
+public sealed partial class PinyinJiaJiaExporter : TextFormatExporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "pyjj", "拼音加加", 120, SupportsImport: false, SupportsExport: true);
-
     /// <summary>
     /// Formats as interleaved Chinese+pinyin, e.g. "深shen蓝lan".
     /// </summary>

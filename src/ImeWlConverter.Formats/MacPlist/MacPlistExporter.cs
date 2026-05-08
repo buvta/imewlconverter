@@ -9,16 +9,12 @@ using ImeWlConverter.Abstractions.Results;
 
 /// <summary>Mac Plist dictionary exporter (XML plist format).</summary>
 [FormatPlugin("plist", "Mac Plist", 150)]
-public sealed class MacPlistExporter : IFormatExporter
+public sealed partial class MacPlistExporter : IFormatExporter
 {
     private const string Header =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><array>";
 
     private const string Footer = "</array></plist>";
-
-    public FormatMetadata Metadata { get; } = new(
-        "plist", "Mac Plist", 150, SupportsImport: false, SupportsExport: true);
-
     public Task<ExportResult> ExportAsync(
         IReadOnlyList<WordEntry> entries, Stream output,
         ExportOptions? options = null, CancellationToken ct = default)

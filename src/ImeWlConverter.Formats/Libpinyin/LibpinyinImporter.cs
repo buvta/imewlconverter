@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Libpinyin dictionary importer (text format). Format: word pinyin</summary>
 [FormatPlugin("libpy", "Libpinyin", 175)]
-public sealed class LibpinyinImporter : TextFormatImporter
+public sealed partial class LibpinyinImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => new UTF8Encoding(false);
-
-    public override FormatMetadata Metadata { get; } = new(
-        "libpy", "Libpinyin", 175, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var sp = line.Split(' ');

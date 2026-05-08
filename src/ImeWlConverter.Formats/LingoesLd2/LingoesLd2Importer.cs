@@ -9,16 +9,12 @@ using Studyzy.IMEWLConverter.IME;
 
 /// <summary>Lingoes ld2 dictionary importer (binary, delegates to legacy).</summary>
 [FormatPlugin("ld2", "灵格斯ld2", 200)]
-public sealed class LingoesLd2Importer : BinaryFormatImporter
+public sealed partial class LingoesLd2Importer : BinaryFormatImporter
 {
     static LingoesLd2Importer()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "ld2", "灵格斯ld2", 200, SupportsImport: true, SupportsExport: false, IsBinary: true);
-
     protected override IReadOnlyList<WordEntry> ParseBinary(Stream input, CancellationToken ct)
     {
         var tempFile = Path.GetTempFileName();

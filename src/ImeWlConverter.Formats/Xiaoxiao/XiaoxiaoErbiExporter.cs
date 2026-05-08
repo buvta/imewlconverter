@@ -9,16 +9,12 @@ using ImeWlConverter.Abstractions.Results;
 
 /// <summary>XiaoxiaoErbi (二笔) dictionary exporter. Export only, groups words by code: "code word1 word2".</summary>
 [FormatPlugin("erbi", "二笔", 100)]
-public sealed class XiaoxiaoErbiExporter : IFormatExporter
+public sealed partial class XiaoxiaoErbiExporter : IFormatExporter
 {
     static XiaoxiaoErbiExporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public FormatMetadata Metadata { get; } = new(
-        "erbi", "二笔", 100, SupportsImport: false, SupportsExport: true);
-
     public Task<ExportResult> ExportAsync(
         IReadOnlyList<WordEntry> entries, Stream output,
         ExportOptions? options = null, CancellationToken ct = default)

@@ -7,7 +7,7 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Sougou Pinyin dictionary exporter (text format).</summary>
 [FormatPlugin("sgpy", "搜狗拼音", 10)]
-public sealed class SougouPinyinExporter : TextFormatExporter
+public sealed partial class SougouPinyinExporter : TextFormatExporter
 {
     static SougouPinyinExporter()
     {
@@ -15,10 +15,6 @@ public sealed class SougouPinyinExporter : TextFormatExporter
     }
 
     protected override Encoding FileEncoding => Encoding.GetEncoding("GBK");
-
-    public override FormatMetadata Metadata { get; } = new(
-        "sgpy", "搜狗拼音", 10, SupportsImport: false, SupportsExport: true);
-
     protected override string? FormatEntry(WordEntry entry)
     {
         var pinyin = entry.Code?.GetPrimaryCode("'") ?? "";

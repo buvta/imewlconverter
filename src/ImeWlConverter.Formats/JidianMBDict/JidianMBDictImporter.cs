@@ -9,16 +9,12 @@ using Studyzy.IMEWLConverter.IME;
 
 /// <summary>Jidian MB dictionary importer (binary, delegates to legacy).</summary>
 [FormatPlugin("jdmb", "极点码表", 190)]
-public sealed class JidianMBDictImporter : BinaryFormatImporter
+public sealed partial class JidianMBDictImporter : BinaryFormatImporter
 {
     static JidianMBDictImporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "jdmb", "极点码表", 190, SupportsImport: true, SupportsExport: false, IsBinary: true);
-
     protected override IReadOnlyList<WordEntry> ParseBinary(Stream input, CancellationToken ct)
     {
         var tempFile = Path.GetTempFileName();

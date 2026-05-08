@@ -2,6 +2,7 @@ namespace ImeWlConverter.Abstractions;
 
 /// <summary>
 /// Marks a class as an IME format plugin for compile-time registration via Source Generator.
+/// The Source Generator reads these values to auto-generate the <c>Metadata</c> property.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 public sealed class FormatPluginAttribute : Attribute
@@ -14,6 +15,9 @@ public sealed class FormatPluginAttribute : Attribute
 
     /// <summary>Sort order for UI display.</summary>
     public int SortOrder { get; }
+
+    /// <summary>Whether this format uses binary encoding (auto-detected from base class if not set).</summary>
+    public bool IsBinary { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FormatPluginAttribute"/> class.

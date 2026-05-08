@@ -9,7 +9,7 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Xiaoxiao IME dictionary importer (text format with code+word pairs).</summary>
 [FormatPlugin("xiaoxiao", "小小输入法", 100)]
-public sealed class XiaoxiaoImporter : TextFormatImporter
+public sealed partial class XiaoxiaoImporter : TextFormatImporter
 {
     private static readonly Regex ContentRegex = new(@"[^\s#]+( [\u4E00-\u9FA5]+)+");
 
@@ -26,10 +26,6 @@ public sealed class XiaoxiaoImporter : TextFormatImporter
             catch { return Encoding.GetEncoding("GB2312"); }
         }
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "xiaoxiao", "小小输入法", 100, SupportsImport: true, SupportsExport: false);
-
     protected override bool IsContentLine(string line) => ContentRegex.IsMatch(line);
 
     protected override IEnumerable<WordEntry> ParseLine(string line)

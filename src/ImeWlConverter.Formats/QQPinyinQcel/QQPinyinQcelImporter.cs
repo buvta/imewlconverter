@@ -9,16 +9,12 @@ using Studyzy.IMEWLConverter.IME;
 
 /// <summary>QQ Pinyin qcel dictionary importer (binary, delegates to legacy).</summary>
 [FormatPlugin("qcel", "QQ拼音qcel", 60)]
-public sealed class QQPinyinQcelImporter : BinaryFormatImporter
+public sealed partial class QQPinyinQcelImporter : BinaryFormatImporter
 {
     static QQPinyinQcelImporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "qcel", "QQ拼音qcel", 60, SupportsImport: true, SupportsExport: false, IsBinary: true);
-
     protected override IReadOnlyList<WordEntry> ParseBinary(Stream input, CancellationToken ct)
     {
         var tempFile = Path.GetTempFileName();

@@ -9,16 +9,12 @@ using Studyzy.IMEWLConverter.IME;
 
 /// <summary>Sougou Pinyin bin backup dictionary importer (binary, delegates to legacy).</summary>
 [FormatPlugin("sgpybin", "搜狗拼音bin", 30)]
-public sealed class SougouBinImporter : BinaryFormatImporter
+public sealed partial class SougouBinImporter : BinaryFormatImporter
 {
     static SougouBinImporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "sgpybin", "搜狗拼音bin", 30, SupportsImport: true, SupportsExport: false, IsBinary: true);
-
     protected override IReadOnlyList<WordEntry> ParseBinary(Stream input, CancellationToken ct)
     {
         var tempFile = Path.GetTempFileName();

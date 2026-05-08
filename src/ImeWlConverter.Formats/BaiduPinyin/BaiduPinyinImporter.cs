@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Baidu Pinyin dictionary importer (text format). Supports both Chinese and English entries.</summary>
 [FormatPlugin("bdpy", "百度拼音", 90)]
-public sealed class BaiduPinyinImporter : TextFormatImporter
+public sealed partial class BaiduPinyinImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "bdpy", "百度拼音", 90, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var array = line.Split('\t');

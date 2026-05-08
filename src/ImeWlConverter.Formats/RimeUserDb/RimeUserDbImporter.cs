@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Rime UserDb dictionary importer. Import only, format: "code\tword\trank".</summary>
 [FormatPlugin("rimedb", "Rime用户库", 150)]
-public sealed class RimeUserDbImporter : TextFormatImporter
+public sealed partial class RimeUserDbImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => new UTF8Encoding(false);
-
-    public override FormatMetadata Metadata { get; } = new(
-        "rimedb", "Rime用户库", 150, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var parts = line.Split('\t');

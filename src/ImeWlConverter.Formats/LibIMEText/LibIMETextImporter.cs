@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>LibIME Text dictionary importer. Format: pinyin word rank</summary>
 [FormatPlugin("libimetxt", "LibIME Text", 500)]
-public sealed class LibIMETextImporter : TextFormatImporter
+public sealed partial class LibIMETextImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.UTF8;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "libimetxt", "LibIME Text", 500, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var parts = line.Split(' ');

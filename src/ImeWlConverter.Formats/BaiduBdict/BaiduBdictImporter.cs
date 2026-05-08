@@ -9,16 +9,12 @@ using Studyzy.IMEWLConverter.IME;
 
 /// <summary>Baidu Pinyin bdict dictionary importer (binary, delegates to legacy).</summary>
 [FormatPlugin("bdict", "百度拼音bdict", 100)]
-public sealed class BaiduBdictImporter : BinaryFormatImporter
+public sealed partial class BaiduBdictImporter : BinaryFormatImporter
 {
     static BaiduBdictImporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "bdict", "百度拼音bdict", 100, SupportsImport: true, SupportsExport: false, IsBinary: true);
-
     protected override IReadOnlyList<WordEntry> ParseBinary(Stream input, CancellationToken ct)
     {
         var tempFile = Path.GetTempFileName();

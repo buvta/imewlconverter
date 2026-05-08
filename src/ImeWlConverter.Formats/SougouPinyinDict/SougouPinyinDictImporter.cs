@@ -13,16 +13,12 @@ using ImeWlConverter.Formats.Shared;
 /// The actual import is handled by SougouBinImporter which delegates to the legacy code.
 /// </remarks>
 [FormatPlugin("sgpydict", "搜狗拼音备份词典", 30)]
-public sealed class SougouPinyinDictImporter : BinaryFormatImporter
+public sealed partial class SougouPinyinDictImporter : BinaryFormatImporter
 {
     static SougouPinyinDictImporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "sgpydict", "搜狗拼音备份词典", 30, SupportsImport: true, SupportsExport: false, IsBinary: true);
-
     protected override IReadOnlyList<WordEntry> ParseBinary(Stream input, CancellationToken ct)
     {
         // SougouPinyinDict is a helper class for the bin format.

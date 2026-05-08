@@ -9,16 +9,12 @@ using Studyzy.IMEWLConverter.IME;
 
 /// <summary>ZiGuang Pinyin uwl dictionary importer (binary, delegates to legacy).</summary>
 [FormatPlugin("uwl", "紫光拼音uwl", 171)]
-public sealed class ZiGuangUwlImporter : BinaryFormatImporter
+public sealed partial class ZiGuangUwlImporter : BinaryFormatImporter
 {
     static ZiGuangUwlImporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "uwl", "紫光拼音uwl", 171, SupportsImport: true, SupportsExport: false, IsBinary: true);
-
     protected override IReadOnlyList<WordEntry> ParseBinary(Stream input, CancellationToken ct)
     {
         var tempFile = Path.GetTempFileName();

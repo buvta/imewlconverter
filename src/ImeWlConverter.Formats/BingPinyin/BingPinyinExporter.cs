@@ -7,13 +7,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Bing Pinyin dictionary exporter (text format). Format: word py1 py2 ...</summary>
 [FormatPlugin("bing", "必应拼音", 135)]
-public sealed class BingPinyinExporter : TextFormatExporter
+public sealed partial class BingPinyinExporter : TextFormatExporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "bing", "必应拼音", 135, SupportsImport: false, SupportsExport: true);
-
     protected override string? FormatEntry(WordEntry entry)
     {
         var pinyin = entry.Code?.GetPrimaryCode(" ") ?? "";

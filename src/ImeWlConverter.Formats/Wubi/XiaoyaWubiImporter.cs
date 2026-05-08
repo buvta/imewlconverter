@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>XiaoyaWubi (小鸭五笔) dictionary importer. Same Jidian format: "code word1 word2 word3".</summary>
 [FormatPlugin("xywb", "小鸭五笔", 191)]
-public sealed class XiaoyaWubiImporter : TextFormatImporter
+public sealed partial class XiaoyaWubiImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "xywb", "小鸭五笔", 191, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var parts = line.Split(' ');

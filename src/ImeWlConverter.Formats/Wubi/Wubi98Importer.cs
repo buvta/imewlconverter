@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Wubi98 dictionary importer. Same format as Wubi86 but uses Wubi98 code type.</summary>
 [FormatPlugin("wb98", "五笔98", 220)]
-public sealed class Wubi98Importer : TextFormatImporter
+public sealed partial class Wubi98Importer : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "wb98", "五笔98", 220, SupportsImport: true, SupportsExport: false);
-
     protected override bool IsContentLine(string line)
         => !string.IsNullOrWhiteSpace(line) && !line.StartsWith('#');
 

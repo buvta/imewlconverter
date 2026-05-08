@@ -9,16 +9,12 @@ using Studyzy.IMEWLConverter.IME;
 
 /// <summary>QQ Pinyin qpyd dictionary importer (binary, delegates to legacy).</summary>
 [FormatPlugin("qpyd", "QQ拼音qpyd", 60)]
-public sealed class QQPinyinQpydImporter : BinaryFormatImporter
+public sealed partial class QQPinyinQpydImporter : BinaryFormatImporter
 {
     static QQPinyinQpydImporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "qpyd", "QQ拼音qpyd", 60, SupportsImport: true, SupportsExport: false, IsBinary: true);
-
     protected override IReadOnlyList<WordEntry> ParseBinary(Stream input, CancellationToken ct)
     {
         var tempFile = Path.GetTempFileName();

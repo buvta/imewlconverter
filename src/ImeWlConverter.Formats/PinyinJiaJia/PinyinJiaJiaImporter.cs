@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>PinyinJiaJia dictionary importer (text format, interleaved Chinese+pinyin).</summary>
 [FormatPlugin("pyjj", "拼音加加", 120)]
-public sealed class PinyinJiaJiaImporter : TextFormatImporter
+public sealed partial class PinyinJiaJiaImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "pyjj", "拼音加加", 120, SupportsImport: true, SupportsExport: false);
-
     /// <summary>
     /// Parses lines like "深shen蓝lan" where Chinese chars and pinyin are interleaved.
     /// Only polyphones get annotated; normal chars use default reading.

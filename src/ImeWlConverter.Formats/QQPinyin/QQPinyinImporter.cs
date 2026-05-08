@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>QQ Pinyin dictionary importer (text format).</summary>
 [FormatPlugin("qqpy", "QQ拼音", 50)]
-public sealed class QQPinyinImporter : TextFormatImporter
+public sealed partial class QQPinyinImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "qqpy", "QQ拼音", 50, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         line = line.Split(',')[0];

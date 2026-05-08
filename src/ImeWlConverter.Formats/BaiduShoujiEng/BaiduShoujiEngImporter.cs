@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Baidu Mobile English dictionary importer. Format: word\trank</summary>
 [FormatPlugin("bdsje", "百度手机英文", 1010)]
-public sealed class BaiduShoujiEngImporter : TextFormatImporter
+public sealed partial class BaiduShoujiEngImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.ASCII;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "bdsje", "百度手机英文", 1010, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var parts = line.Split('\t');

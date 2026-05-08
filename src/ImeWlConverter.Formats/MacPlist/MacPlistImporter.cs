@@ -11,10 +11,8 @@ using ImeWlConverter.Abstractions.Results;
 
 /// <summary>Mac Plist dictionary importer (XML plist format).</summary>
 [FormatPlugin("plist", "Mac Plist", 150)]
-public sealed class MacPlistImporter : IFormatImporter
+public sealed partial class MacPlistImporter : IFormatImporter
 {
-    public FormatMetadata Metadata { get; } = new(
-        "plist", "Mac Plist", 150, SupportsImport: true, SupportsExport: false);
 
     public Task<ImportResult> ImportAsync(Stream input, ImportOptions? options = null, CancellationToken ct = default)
     {

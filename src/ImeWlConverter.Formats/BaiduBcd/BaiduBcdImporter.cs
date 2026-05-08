@@ -9,16 +9,12 @@ using Studyzy.IMEWLConverter.IME;
 
 /// <summary>Baidu Shouji bcd dictionary importer (binary, delegates to legacy).</summary>
 [FormatPlugin("bcd", "百度手机bcd", 1020)]
-public sealed class BaiduBcdImporter : BinaryFormatImporter
+public sealed partial class BaiduBcdImporter : BinaryFormatImporter
 {
     static BaiduBcdImporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "bcd", "百度手机bcd", 1020, SupportsImport: true, SupportsExport: false, IsBinary: true);
-
     protected override IReadOnlyList<WordEntry> ParseBinary(Stream input, CancellationToken ct)
     {
         var tempFile = Path.GetTempFileName();

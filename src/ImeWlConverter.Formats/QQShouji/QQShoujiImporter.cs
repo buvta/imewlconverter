@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>QQ Mobile dictionary importer. Format: pinyin word number Z, pinyin number</summary>
 [FormatPlugin("qqsj", "QQ手机", 1030)]
-public sealed class QQShoujiImporter : TextFormatImporter
+public sealed partial class QQShoujiImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "qqsj", "QQ手机", 1030, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         if (!line.Contains("Z,"))

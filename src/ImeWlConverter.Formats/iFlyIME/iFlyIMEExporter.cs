@@ -9,7 +9,7 @@ using ImeWlConverter.Abstractions.Results;
 
 /// <summary>iFlyIME (讯飞输入法) dictionary exporter. Splits into 16000-entry files with iFly header.</summary>
 [FormatPlugin("ifly", "讯飞输入法", 1050)]
-public sealed class iFlyIMEExporter : IFormatExporter
+public sealed partial class iFlyIMEExporter : IFormatExporter
 {
     private const string HeaderFormat =
         @"###注释部分，请勿修改###
@@ -27,10 +27,6 @@ public sealed class iFlyIMEExporter : IFormatExporter
 #类型取值：1－联系人，0－其它，若无此项或取值非法，则默认做0处理
 
 ###以下为正文内容###";
-
-    public FormatMetadata Metadata { get; } = new(
-        "ifly", "讯飞输入法", 1050, SupportsImport: false, SupportsExport: true);
-
     public Task<ExportResult> ExportAsync(
         IReadOnlyList<WordEntry> entries, Stream output,
         ExportOptions? options = null, CancellationToken ct = default)

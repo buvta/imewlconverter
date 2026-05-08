@@ -8,7 +8,7 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Google Pinyin dictionary importer (text format).</summary>
 [FormatPlugin("ggpy", "谷歌拼音", 110)]
-public sealed class GooglePinyinImporter : TextFormatImporter
+public sealed partial class GooglePinyinImporter : TextFormatImporter
 {
     static GooglePinyinImporter()
     {
@@ -16,10 +16,6 @@ public sealed class GooglePinyinImporter : TextFormatImporter
     }
 
     protected override Encoding FileEncoding => Encoding.GetEncoding("GBK");
-
-    public override FormatMetadata Metadata { get; } = new(
-        "ggpy", "谷歌拼音", 110, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var parts = line.Split('\t');

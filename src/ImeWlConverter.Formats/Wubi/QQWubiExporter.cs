@@ -9,10 +9,8 @@ using ImeWlConverter.Abstractions.Results;
 
 /// <summary>QQ Wubi dictionary exporter. Groups words by code: "code word1 word2".</summary>
 [FormatPlugin("qqwb", "QQ五笔", 70)]
-public sealed class QQWubiExporter : IFormatExporter
+public sealed partial class QQWubiExporter : IFormatExporter
 {
-    public FormatMetadata Metadata { get; } = new(
-        "qqwb", "QQ五笔", 70, SupportsImport: false, SupportsExport: true);
 
     public Task<ExportResult> ExportAsync(
         IReadOnlyList<WordEntry> entries, Stream output,

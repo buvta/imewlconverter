@@ -9,10 +9,8 @@ using ImeWlConverter.Abstractions.Results;
 
 /// <summary>JidianZhengma (极点郑码) dictionary exporter. Same format as Jidian but uses Zhengma code type.</summary>
 [FormatPlugin("jdzm", "极点郑码", 190)]
-public sealed class JidianZhengmaExporter : IFormatExporter
+public sealed partial class JidianZhengmaExporter : IFormatExporter
 {
-    public FormatMetadata Metadata { get; } = new(
-        "jdzm", "极点郑码", 190, SupportsImport: false, SupportsExport: true);
 
     public Task<ExportResult> ExportAsync(
         IReadOnlyList<WordEntry> entries, Stream output,

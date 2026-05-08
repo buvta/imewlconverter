@@ -7,15 +7,11 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>LibIME Text dictionary exporter. Format: word pinyin rank (with lue→lve, nue→nve)</summary>
 [FormatPlugin("libimetxt", "LibIME Text", 500)]
-public sealed class LibIMETextExporter : TextFormatExporter
+public sealed partial class LibIMETextExporter : TextFormatExporter
 {
     protected override Encoding FileEncoding => Encoding.UTF8;
 
     protected override string LineEnding => "\n";
-
-    public override FormatMetadata Metadata { get; } = new(
-        "libimetxt", "LibIME Text", 500, SupportsImport: false, SupportsExport: true);
-
     protected override string? FormatEntry(WordEntry entry)
     {
         var pinyin = entry.Code?.GetPrimaryCode("'") ?? "";

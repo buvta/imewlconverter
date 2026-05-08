@@ -9,16 +9,12 @@ using Studyzy.IMEWLConverter.IME;
 
 /// <summary>Baidu Pinyin backup file importer (binary, delegates to legacy).</summary>
 [FormatPlugin("bdpybin", "百度拼音备份", 20)]
-public sealed class BaiduPinyinBackupImporter : BinaryFormatImporter
+public sealed partial class BaiduPinyinBackupImporter : BinaryFormatImporter
 {
     static BaiduPinyinBackupImporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "bdpybin", "百度拼音备份", 20, SupportsImport: true, SupportsExport: false, IsBinary: true);
-
     protected override IReadOnlyList<WordEntry> ParseBinary(Stream input, CancellationToken ct)
     {
         var tempFile = Path.GetTempFileName();

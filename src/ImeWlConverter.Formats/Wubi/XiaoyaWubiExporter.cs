@@ -9,10 +9,8 @@ using ImeWlConverter.Abstractions.Results;
 
 /// <summary>XiaoyaWubi (小鸭五笔) dictionary exporter. Groups words by code: "code word1 word2".</summary>
 [FormatPlugin("xywb", "小鸭五笔", 191)]
-public sealed class XiaoyaWubiExporter : IFormatExporter
+public sealed partial class XiaoyaWubiExporter : IFormatExporter
 {
-    public FormatMetadata Metadata { get; } = new(
-        "xywb", "小鸭五笔", 191, SupportsImport: false, SupportsExport: true);
 
     public Task<ExportResult> ExportAsync(
         IReadOnlyList<WordEntry> entries, Stream output,

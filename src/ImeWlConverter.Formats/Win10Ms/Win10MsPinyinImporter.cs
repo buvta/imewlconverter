@@ -9,16 +9,12 @@ using Studyzy.IMEWLConverter.IME;
 
 /// <summary>Win10 Microsoft Pinyin dictionary importer (binary, delegates to legacy).</summary>
 [FormatPlugin("win10mspy", "Win10微软拼音", 130)]
-public sealed class Win10MsPinyinImporter : BinaryFormatImporter
+public sealed partial class Win10MsPinyinImporter : BinaryFormatImporter
 {
     static Win10MsPinyinImporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "win10mspy", "Win10微软拼音", 130, SupportsImport: true, SupportsExport: false, IsBinary: true);
-
     protected override IReadOnlyList<WordEntry> ParseBinary(Stream input, CancellationToken ct)
     {
         var tempFile = Path.GetTempFileName();

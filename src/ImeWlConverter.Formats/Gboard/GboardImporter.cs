@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Gboard dictionary importer (tab-separated text in zip).</summary>
 [FormatPlugin("gboard", "Gboard", 111)]
-public sealed class GboardImporter : TextFormatImporter
+public sealed partial class GboardImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => new UTF8Encoding(false);
-
-    public override FormatMetadata Metadata { get; } = new(
-        "gboard", "Gboard", 111, SupportsImport: true, SupportsExport: false);
-
     protected override bool IsContentLine(string line)
         => !string.IsNullOrWhiteSpace(line) && !line.StartsWith("#");
 

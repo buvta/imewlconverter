@@ -9,10 +9,8 @@ using ImeWlConverter.Abstractions.Results;
 
 /// <summary>Yahoo KeyKey (雅虎奇摩) dictionary exporter. Includes MJSR header and database footer.</summary>
 [FormatPlugin("yahoo", "Yahoo KeyKey", 200)]
-public sealed class YahooKeyKeyExporter : IFormatExporter
+public sealed partial class YahooKeyKeyExporter : IFormatExporter
 {
-    public FormatMetadata Metadata { get; } = new(
-        "yahoo", "Yahoo KeyKey", 200, SupportsImport: false, SupportsExport: true);
 
     public Task<ExportResult> ExportAsync(
         IReadOnlyList<WordEntry> entries, Stream output,

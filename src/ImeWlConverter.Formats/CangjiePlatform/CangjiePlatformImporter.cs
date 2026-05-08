@@ -8,7 +8,7 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>CangjiePlatform dictionary importer (space-separated code+word).</summary>
 [FormatPlugin("cjpt", "仓颉平台", 230)]
-public sealed class CangjiePlatformImporter : TextFormatImporter
+public sealed partial class CangjiePlatformImporter : TextFormatImporter
 {
     static CangjiePlatformImporter()
     {
@@ -16,10 +16,6 @@ public sealed class CangjiePlatformImporter : TextFormatImporter
     }
 
     protected override Encoding FileEncoding => Encoding.GetEncoding("GBK");
-
-    public override FormatMetadata Metadata { get; } = new(
-        "cjpt", "仓颉平台", 230, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var parts = line.Split(' ');

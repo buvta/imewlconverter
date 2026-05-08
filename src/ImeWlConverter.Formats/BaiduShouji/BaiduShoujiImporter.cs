@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Baidu Mobile dictionary importer. Format: word(pin|yin) rank</summary>
 [FormatPlugin("bdsj", "百度手机", 1000)]
-public sealed class BaiduShoujiImporter : TextFormatImporter
+public sealed partial class BaiduShoujiImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "bdsj", "百度手机", 1000, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var parenIdx = line.IndexOf('(');

@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>QQ Wubi dictionary importer. Same Jidian format: "code word1 word2 word3".</summary>
 [FormatPlugin("qqwb", "QQ五笔", 70)]
-public sealed class QQWubiImporter : TextFormatImporter
+public sealed partial class QQWubiImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "qqwb", "QQ五笔", 70, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var parts = line.Split(' ');

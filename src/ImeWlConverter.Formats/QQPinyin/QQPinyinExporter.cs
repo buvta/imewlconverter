@@ -7,13 +7,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>QQ Pinyin dictionary exporter (text format).</summary>
 [FormatPlugin("qqpy", "QQ拼音", 50)]
-public sealed class QQPinyinExporter : TextFormatExporter
+public sealed partial class QQPinyinExporter : TextFormatExporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "qqpy", "QQ拼音", 50, SupportsImport: false, SupportsExport: true);
-
     protected override string? FormatEntry(WordEntry entry)
     {
         var pinyin = entry.Code?.GetPrimaryCode("'") ?? "";

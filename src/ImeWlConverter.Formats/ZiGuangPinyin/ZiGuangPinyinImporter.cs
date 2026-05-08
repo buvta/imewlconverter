@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>ZiGuang (Huayu) Pinyin dictionary importer (text format). Format: word\tpinyin</summary>
 [FormatPlugin("zgpy", "紫光拼音", 170)]
-public sealed class ZiGuangPinyinImporter : TextFormatImporter
+public sealed partial class ZiGuangPinyinImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "zgpy", "紫光拼音", 170, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var parts = line.Split('\t');

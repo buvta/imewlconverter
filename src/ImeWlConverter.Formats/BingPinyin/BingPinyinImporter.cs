@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Bing Pinyin dictionary importer (text format). Format: word py1 py2 ...</summary>
 [FormatPlugin("bing", "必应拼音", 135)]
-public sealed class BingPinyinImporter : TextFormatImporter
+public sealed partial class BingPinyinImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "bing", "必应拼音", 135, SupportsImport: true, SupportsExport: false);
-
     protected override bool IsContentLine(string line) =>
         !string.IsNullOrWhiteSpace(line) && !line.StartsWith(";");
 

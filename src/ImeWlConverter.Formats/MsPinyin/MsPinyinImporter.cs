@@ -11,10 +11,8 @@ using ImeWlConverter.Abstractions.Results;
 
 /// <summary>Microsoft Pinyin dictionary importer (XML format).</summary>
 [FormatPlugin("mspy", "微软拼音", 135)]
-public sealed class MsPinyinImporter : IFormatImporter
+public sealed partial class MsPinyinImporter : IFormatImporter
 {
-    public FormatMetadata Metadata { get; } = new(
-        "mspy", "微软拼音", 135, SupportsImport: true, SupportsExport: false);
 
     public Task<ImportResult> ImportAsync(Stream input, ImportOptions? options = null, CancellationToken ct = default)
     {

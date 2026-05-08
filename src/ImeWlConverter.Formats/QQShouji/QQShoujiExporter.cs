@@ -10,10 +10,8 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>QQ Mobile dictionary exporter. Format: pinyin word number Z, pinyin number</summary>
 [FormatPlugin("qqsj", "QQ手机", 1030)]
-public sealed class QQShoujiExporter : IFormatExporter
+public sealed partial class QQShoujiExporter : IFormatExporter
 {
-    public FormatMetadata Metadata { get; } = new(
-        "qqsj", "QQ手机", 1030, SupportsImport: false, SupportsExport: true);
 
     public Task<ExportResult> ExportAsync(
         IReadOnlyList<WordEntry> entries, Stream output,

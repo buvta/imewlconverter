@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>JidianZhengma (极点郑码) dictionary importer. Same format as Jidian but uses Zhengma code type.</summary>
 [FormatPlugin("jdzm", "极点郑码", 190)]
-public sealed class JidianZhengmaImporter : TextFormatImporter
+public sealed partial class JidianZhengmaImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "jdzm", "极点郑码", 190, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var parts = line.Split(' ');

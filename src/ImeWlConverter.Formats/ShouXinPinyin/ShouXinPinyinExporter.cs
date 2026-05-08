@@ -7,13 +7,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>ShouXin Pinyin dictionary exporter (text format). Format: word\tpinyin\trank</summary>
 [FormatPlugin("sxpy", "手心拼音", 180)]
-public sealed class ShouXinPinyinExporter : TextFormatExporter
+public sealed partial class ShouXinPinyinExporter : TextFormatExporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "sxpy", "手心拼音", 180, SupportsImport: false, SupportsExport: true);
-
     protected override string? FormatEntry(WordEntry entry)
     {
         var pinyin = entry.Code?.GetPrimaryCode("'") ?? "";

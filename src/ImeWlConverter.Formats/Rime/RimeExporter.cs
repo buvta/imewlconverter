@@ -7,15 +7,11 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Rime dictionary exporter (text format). Format: word\tcode\trank</summary>
 [FormatPlugin("rime", "Rime", 150)]
-public sealed class RimeExporter : TextFormatExporter
+public sealed partial class RimeExporter : TextFormatExporter
 {
     protected override Encoding FileEncoding => new UTF8Encoding(false);
 
     protected override string LineEnding => "\n";
-
-    public override FormatMetadata Metadata { get; } = new(
-        "rime", "Rime", 150, SupportsImport: false, SupportsExport: true);
-
     protected override string? FormatEntry(WordEntry entry)
     {
         var code = entry.Code?.GetPrimaryCode(" ") ?? "";

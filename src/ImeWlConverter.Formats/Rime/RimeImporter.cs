@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Rime dictionary importer (text format). Format: word\tcode\trank</summary>
 [FormatPlugin("rime", "Rime", 150)]
-public sealed class RimeImporter : TextFormatImporter
+public sealed partial class RimeImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => new UTF8Encoding(false);
-
-    public override FormatMetadata Metadata { get; } = new(
-        "rime", "Rime", 150, SupportsImport: true, SupportsExport: false);
-
     protected override bool IsContentLine(string line) =>
         !string.IsNullOrWhiteSpace(line) && !line.StartsWith("#");
 

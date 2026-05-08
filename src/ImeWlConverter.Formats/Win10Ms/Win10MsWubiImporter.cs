@@ -9,16 +9,12 @@ using Studyzy.IMEWLConverter.IME;
 
 /// <summary>Win10 Microsoft Wubi dictionary importer (binary, delegates to legacy).</summary>
 [FormatPlugin("win10mswb", "Win10微软五笔", 131)]
-public sealed class Win10MsWubiImporter : BinaryFormatImporter
+public sealed partial class Win10MsWubiImporter : BinaryFormatImporter
 {
     static Win10MsWubiImporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "win10mswb", "Win10微软五笔", 131, SupportsImport: true, SupportsExport: false, IsBinary: true);
-
     protected override IReadOnlyList<WordEntry> ParseBinary(Stream input, CancellationToken ct)
     {
         var tempFile = Path.GetTempFileName();

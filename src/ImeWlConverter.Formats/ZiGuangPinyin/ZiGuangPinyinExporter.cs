@@ -7,13 +7,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>ZiGuang (Huayu) Pinyin dictionary exporter (text format). Format: word\tpinyin\t100000</summary>
 [FormatPlugin("zgpy", "紫光拼音", 170)]
-public sealed class ZiGuangPinyinExporter : TextFormatExporter
+public sealed partial class ZiGuangPinyinExporter : TextFormatExporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "zgpy", "紫光拼音", 170, SupportsImport: false, SupportsExport: true);
-
     protected override string? GetHeader() => "名称=用户词库\r\n作者=深蓝词库转换\r\n编辑=1\r\n";
 
     protected override string? FormatEntry(WordEntry entry)

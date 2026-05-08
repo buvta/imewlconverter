@@ -7,13 +7,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Baidu Mobile dictionary exporter. Format: word(pin|yin) 20000</summary>
 [FormatPlugin("bdsj", "百度手机", 1000)]
-public sealed class BaiduShoujiExporter : TextFormatExporter
+public sealed partial class BaiduShoujiExporter : TextFormatExporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "bdsj", "百度手机", 1000, SupportsImport: false, SupportsExport: true);
-
     protected override string? FormatEntry(WordEntry entry)
     {
         var pinyin = entry.Code?.GetPrimaryCode("|") ?? "";

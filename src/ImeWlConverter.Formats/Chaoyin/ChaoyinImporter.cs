@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Chaoyin (超音速录) dictionary importer. Format: "code = rank,word".</summary>
 [FormatPlugin("cysl", "超音速录", 190)]
-public sealed class ChaoyinImporter : TextFormatImporter
+public sealed partial class ChaoyinImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "cysl", "超音速录", 190, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         // Format: code = rank,word

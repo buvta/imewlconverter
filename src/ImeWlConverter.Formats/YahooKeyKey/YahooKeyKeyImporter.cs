@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Yahoo KeyKey (雅虎奇摩) dictionary importer. Tab-separated: word, zhuyin, score1, score2.</summary>
 [FormatPlugin("yahoo", "Yahoo KeyKey", 200)]
-public sealed class YahooKeyKeyImporter : TextFormatImporter
+public sealed partial class YahooKeyKeyImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.UTF8;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "yahoo", "Yahoo KeyKey", 200, SupportsImport: true, SupportsExport: false);
-
     protected override bool IsContentLine(string line)
         => line.Split('\t').Length == 4;
 

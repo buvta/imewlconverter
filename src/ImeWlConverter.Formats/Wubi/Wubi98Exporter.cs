@@ -7,13 +7,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Wubi98 dictionary exporter. Format: "code word".</summary>
 [FormatPlugin("wb98", "五笔98", 220)]
-public sealed class Wubi98Exporter : TextFormatExporter
+public sealed partial class Wubi98Exporter : TextFormatExporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "wb98", "五笔98", 220, SupportsImport: false, SupportsExport: true);
-
     protected override string? FormatEntry(WordEntry entry)
     {
         var code = entry.Code?.GetPrimaryCode("") ?? "";

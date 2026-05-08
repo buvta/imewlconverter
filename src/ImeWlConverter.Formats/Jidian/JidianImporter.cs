@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Jidian (极点) dictionary importer. Format: "code word1 word2 word3".</summary>
 [FormatPlugin("jd", "极点", 190)]
-public sealed class JidianImporter : TextFormatImporter
+public sealed partial class JidianImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "jd", "极点", 190, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var parts = line.Split(' ');

@@ -9,15 +9,11 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Emoji dictionary importer. Import only, format: "emoji\tword".</summary>
 [FormatPlugin("emoji", "Emoji", 999)]
-public sealed class EmojiImporter : TextFormatImporter
+public sealed partial class EmojiImporter : TextFormatImporter
 {
     private static readonly Regex EnglishRegex = new("^[a-zA-Z]+$");
 
     protected override Encoding FileEncoding => Encoding.UTF8;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "emoji", "Emoji", 999, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var parts = line.Split('\t');

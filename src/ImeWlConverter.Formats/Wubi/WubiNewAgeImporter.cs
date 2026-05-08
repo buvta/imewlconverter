@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>WubiNewAge (五笔新世纪) dictionary importer. Same format as Wubi86.</summary>
 [FormatPlugin("wbnewage", "五笔新世纪", 221)]
-public sealed class WubiNewAgeImporter : TextFormatImporter
+public sealed partial class WubiNewAgeImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "wbnewage", "五笔新世纪", 221, SupportsImport: true, SupportsExport: false);
-
     protected override bool IsContentLine(string line)
         => !string.IsNullOrWhiteSpace(line) && !line.StartsWith('#');
 

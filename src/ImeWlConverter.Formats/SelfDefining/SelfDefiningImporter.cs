@@ -9,16 +9,12 @@ using Studyzy.IMEWLConverter.IME;
 
 /// <summary>Self-defining format importer (delegates to legacy for pattern parsing).</summary>
 [FormatPlugin("self", "自定义", 2000)]
-public sealed class SelfDefiningImporter : BinaryFormatImporter
+public sealed partial class SelfDefiningImporter : BinaryFormatImporter
 {
     static SelfDefiningImporter()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
-    public override FormatMetadata Metadata { get; } = new(
-        "self", "自定义", 2000, SupportsImport: true, SupportsExport: false);
-
     protected override IReadOnlyList<WordEntry> ParseBinary(Stream input, CancellationToken ct)
     {
         // SelfDefining requires ParsePattern configuration which is set externally.

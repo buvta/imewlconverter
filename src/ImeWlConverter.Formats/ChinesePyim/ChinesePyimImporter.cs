@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Chinese-pyim dictionary importer (text format). Format: pin-yin word1 word2 ...</summary>
 [FormatPlugin("pyim", "ChinesePyim", 177)]
-public sealed class ChinesePyimImporter : TextFormatImporter
+public sealed partial class ChinesePyimImporter : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.UTF8;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "pyim", "ChinesePyim", 177, SupportsImport: true, SupportsExport: false);
-
     protected override bool IsContentLine(string line) =>
         !string.IsNullOrWhiteSpace(line) && !line.StartsWith(";");
 

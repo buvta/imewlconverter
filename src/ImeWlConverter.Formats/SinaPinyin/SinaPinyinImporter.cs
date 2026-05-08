@@ -8,7 +8,7 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Sina Pinyin dictionary importer (text format). Format: pinyin word</summary>
 [FormatPlugin("xlpy", "新浪拼音", 180)]
-public sealed class SinaPinyinImporter : TextFormatImporter
+public sealed partial class SinaPinyinImporter : TextFormatImporter
 {
     static SinaPinyinImporter()
     {
@@ -16,10 +16,6 @@ public sealed class SinaPinyinImporter : TextFormatImporter
     }
 
     protected override Encoding FileEncoding => Encoding.GetEncoding("GBK");
-
-    public override FormatMetadata Metadata { get; } = new(
-        "xlpy", "新浪拼音", 180, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         var parts = line.Split(' ');

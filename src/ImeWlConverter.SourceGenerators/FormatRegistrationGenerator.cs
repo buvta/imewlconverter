@@ -10,9 +10,14 @@ using Microsoft.CodeAnalysis.Text;
 [Generator]
 public class FormatRegistrationGenerator : IIncrementalGenerator
 {
+    private const string ImporterInterface = "ImeWlConverter.Abstractions.Contracts.IFormatImporter";
+    private const string ExporterInterface = "ImeWlConverter.Abstractions.Contracts.IFormatExporter";
+    private const string BinaryImporterBase = "BinaryFormatImporter";
+    private const string TextImporterBase = "TextFormatImporter";
+    private const string TextExporterBase = "TextFormatExporter";
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // Find all classes with [FormatPlugin] attribute
         var formatClasses = context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 "ImeWlConverter.Abstractions.FormatPluginAttribute",
@@ -21,15 +26,23 @@ public class FormatRegistrationGenerator : IIncrementalGenerator
             .Where(static info => info is not null)
             .Select(static (info, _) => info!.Value);
 
-        // Collect all format info
         var collected = formatClasses.Collect();
 
-        // Generate the registration code
         context.RegisterSourceOutput(collected, static (spc, formats) =>
         {
             if (formats.IsEmpty) return;
-            var source = GenerateRegistrationCode(formats);
-            spc.AddSource("FormatRegistry.g.cs", SourceText.From(source, Encoding.UTF8));
+
+            // Generate DI registration
+            spc.AddSource("FormatRegistry.g.cs",
+                SourceText.From(GenerateRegistrationCode(formats), Encoding.UTF8));
+
+            // Generate Metadata property for each format class
+            foreach (var format in formats)
+            {
+                var source = GenerateMetadataCode(format);
+                var hintName = format.ClassName + ".Metadata.g.cs";
+                spc.AddSource(hintName, SourceText.From(source, Encoding.UTF8));
+            }
         });
     }
 
@@ -41,24 +54,77 @@ public class FormatRegistrationGenerator : IIncrementalGenerator
         var attr = context.Attributes.FirstOrDefault();
         if (attr == null) return null;
 
+        // Read constructor arguments
         var id = attr.ConstructorArguments.Length > 0
             ? attr.ConstructorArguments[0].Value?.ToString() ?? ""
             : "";
         var displayName = attr.ConstructorArguments.Length > 1
             ? attr.ConstructorArguments[1].Value?.ToString() ?? ""
             : "";
+        var sortOrder = attr.ConstructorArguments.Length > 2
+            ? (int)(attr.ConstructorArguments[2].Value ?? 100)
+            : 100;
 
-        var isImporter = symbol.AllInterfaces.Any(i =>
-            i.ToDisplayString() == "ImeWlConverter.Abstractions.Contracts.IFormatImporter");
-        var isExporter = symbol.AllInterfaces.Any(i =>
-            i.ToDisplayString() == "ImeWlConverter.Abstractions.Contracts.IFormatExporter");
+        // Read named arguments (IsBinary)
+        bool? isBinaryExplicit = null;
+        foreach (var named in attr.NamedArguments)
+        {
+            if (named.Key == "IsBinary")
+                isBinaryExplicit = (bool?)named.Value.Value;
+        }
+
+        // Detect interfaces
+        var isImporter = symbol.AllInterfaces.Any(i => i.ToDisplayString() == ImporterInterface);
+        var isExporter = symbol.AllInterfaces.Any(i => i.ToDisplayString() == ExporterInterface);
+
+        // Detect IsBinary from base class chain
+        var isBinary = isBinaryExplicit ?? InheritsFromBinaryImporter(symbol);
+
+        // Detect if base class has abstract Metadata (needs override keyword)
+        var needsOverride = InheritsFromAbstractBase(symbol);
+
+        // Get namespace
+        var ns = symbol.ContainingNamespace.IsGlobalNamespace
+            ? ""
+            : symbol.ContainingNamespace.ToDisplayString();
 
         return new FormatInfo(
             symbol.ToDisplayString(),
+            symbol.Name,
+            ns,
             id,
             displayName,
+            sortOrder,
             isImporter,
-            isExporter);
+            isExporter,
+            isBinary,
+            needsOverride);
+    }
+
+    private static bool InheritsFromBinaryImporter(INamedTypeSymbol symbol)
+    {
+        var current = symbol.BaseType;
+        while (current != null)
+        {
+            if (current.Name == BinaryImporterBase)
+                return true;
+            current = current.BaseType;
+        }
+        return false;
+    }
+
+    private static bool InheritsFromAbstractBase(INamedTypeSymbol symbol)
+    {
+        var current = symbol.BaseType;
+        while (current != null)
+        {
+            if (current.Name == TextImporterBase ||
+                current.Name == TextExporterBase ||
+                current.Name == BinaryImporterBase)
+                return true;
+            current = current.BaseType;
+        }
+        return false;
     }
 
     private static string GenerateRegistrationCode(ImmutableArray<FormatInfo> formats)
@@ -96,21 +162,62 @@ public class FormatRegistrationGenerator : IIncrementalGenerator
         return sb.ToString();
     }
 
+    private static string GenerateMetadataCode(FormatInfo format)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("// <auto-generated/>");
+        sb.AppendLine("#nullable enable");
+        sb.AppendLine();
+
+        if (!string.IsNullOrEmpty(format.Namespace))
+        {
+            sb.AppendLine($"namespace {format.Namespace};");
+            sb.AppendLine();
+        }
+
+        var modifier = format.NeedsOverride ? "override " : "";
+        sb.AppendLine($"partial class {format.ClassName}");
+        sb.AppendLine("{");
+        sb.AppendLine($"    public {modifier}ImeWlConverter.Abstractions.Models.FormatMetadata Metadata {{ get; }} =");
+        sb.AppendLine($"        new(\"{Escape(format.Id)}\", \"{Escape(format.DisplayName)}\", {format.SortOrder}, " +
+                      $"SupportsImport: {Bool(format.IsImporter)}, SupportsExport: {Bool(format.IsExporter)}, " +
+                      $"IsBinary: {Bool(format.IsBinary)});");
+        sb.AppendLine("}");
+
+        return sb.ToString();
+    }
+
+    private static string Bool(bool value) => value ? "true" : "false";
+
+    private static string Escape(string s) => s.Replace("\\", "\\\\").Replace("\"", "\\\"");
+
     private readonly struct FormatInfo
     {
         public string FullTypeName { get; }
+        public string ClassName { get; }
+        public string Namespace { get; }
         public string Id { get; }
         public string DisplayName { get; }
+        public int SortOrder { get; }
         public bool IsImporter { get; }
         public bool IsExporter { get; }
+        public bool IsBinary { get; }
+        public bool NeedsOverride { get; }
 
-        public FormatInfo(string fullTypeName, string id, string displayName, bool isImporter, bool isExporter)
+        public FormatInfo(string fullTypeName, string className, string ns,
+            string id, string displayName, int sortOrder,
+            bool isImporter, bool isExporter, bool isBinary, bool needsOverride)
         {
             FullTypeName = fullTypeName;
+            ClassName = className;
+            Namespace = ns;
             Id = id;
             DisplayName = displayName;
+            SortOrder = sortOrder;
             IsImporter = isImporter;
             IsExporter = isExporter;
+            IsBinary = isBinary;
+            NeedsOverride = needsOverride;
         }
     }
 }

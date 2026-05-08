@@ -8,13 +8,9 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Wubi86 dictionary importer. Supports "code word" and "word code" formats.</summary>
 [FormatPlugin("wb86", "五笔86", 210)]
-public sealed class Wubi86Importer : TextFormatImporter
+public sealed partial class Wubi86Importer : TextFormatImporter
 {
     protected override Encoding FileEncoding => Encoding.Unicode;
-
-    public override FormatMetadata Metadata { get; } = new(
-        "wb86", "五笔86", 210, SupportsImport: true, SupportsExport: false);
-
     protected override bool IsContentLine(string line)
         => !string.IsNullOrWhiteSpace(line) && !line.StartsWith('#');
 

@@ -7,15 +7,11 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Chinese-pyim dictionary exporter (text format). Format: pin-yin word</summary>
 [FormatPlugin("pyim", "ChinesePyim", 177)]
-public sealed class ChinesePyimExporter : TextFormatExporter
+public sealed partial class ChinesePyimExporter : TextFormatExporter
 {
     protected override Encoding FileEncoding => Encoding.UTF8;
 
     protected override string LineEnding => "\n";
-
-    public override FormatMetadata Metadata { get; } = new(
-        "pyim", "ChinesePyim", 177, SupportsImport: false, SupportsExport: true);
-
     protected override string? GetHeader() => ";; -*- coding: utf-8 -*--";
 
     protected override string? FormatEntry(WordEntry entry)

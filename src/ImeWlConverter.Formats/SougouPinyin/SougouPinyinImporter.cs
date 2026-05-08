@@ -8,7 +8,7 @@ using ImeWlConverter.Formats.Shared;
 
 /// <summary>Sougou Pinyin dictionary importer (text format).</summary>
 [FormatPlugin("sgpy", "搜狗拼音", 10)]
-public sealed class SougouPinyinImporter : TextFormatImporter
+public sealed partial class SougouPinyinImporter : TextFormatImporter
 {
     static SougouPinyinImporter()
     {
@@ -16,10 +16,6 @@ public sealed class SougouPinyinImporter : TextFormatImporter
     }
 
     protected override Encoding FileEncoding => Encoding.GetEncoding("GBK");
-
-    public override FormatMetadata Metadata { get; } = new(
-        "sgpy", "搜狗拼音", 10, SupportsImport: true, SupportsExport: false);
-
     protected override IEnumerable<WordEntry> ParseLine(string line)
     {
         if (line.IndexOf("'") != 0)
