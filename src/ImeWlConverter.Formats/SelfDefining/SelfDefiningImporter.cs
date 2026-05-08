@@ -5,9 +5,7 @@ using ImeWlConverter.Abstractions;
 using ImeWlConverter.Abstractions.Enums;
 using ImeWlConverter.Abstractions.Models;
 using ImeWlConverter.Formats.Shared;
-using Studyzy.IMEWLConverter.IME;
-
-/// <summary>Self-defining format importer (delegates to legacy for pattern parsing).</summary>
+/// <summary>Self-defining format importer (tab-separated: code, word, rank).</summary>
 [FormatPlugin("self", "自定义", 2000)]
 public sealed partial class SelfDefiningImporter : BinaryFormatImporter
 {
