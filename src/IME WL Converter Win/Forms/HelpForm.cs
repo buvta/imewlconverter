@@ -35,35 +35,34 @@ public partial class HelpForm : Form
     private void HelpForm_Load(object sender, EventArgs e)
     {
         var helpString =
-            "1.1版支持搜狗的细胞词库（scel格式）的转换，您可以到搜狗网站下载细胞词库导入到您其他输入法或者手机输入法中！\r\nQQ的分类词库格式还没有研究出来怎么解析。\r\n";
-        helpString += "1.2版支持了紫光拼音输入法和拼音加加输入法的词库导入导出功能。增加了批量导入的功能。修复了有些scel格式词库导入时报错\r\n";
-        helpString += "1.3版改进汉字自动注音功能，可以对纯汉字的词库进行注音和转换；并可设置不显示转换结果而直接导出结果以提高超大词库的转换效率\r\n";
+            "深蓝词库转换 - 版本更新记录\r\n\r\n";
+        helpString += "注意：该小工具基于C#开发，需要.NET 10.0运行时环境，支持Windows、Linux和macOS平台。\r\n\r\n";
+        helpString += "1.1版支持搜狗的细胞词库（scel格式）的转换，您可以到搜狗网站下载细胞词库导入到您其他输入法或者手机输入法中！\r\n";
+        helpString += "1.2版支持了紫光拼音输入法和拼音加加输入法的词库导入导出功能。增加了批量导入的功能。修复了有些scel格式词库导入时报错。\r\n";
+        helpString += "1.3版增强了多音字注音功能和外挂多音字注音词库功能，另外还提供了直接导出而不显示转换结果的选项。\r\n";
         helpString += "1.4版增加了对触宝输入法的支持，增加了拖拽功能。\r\n";
         helpString += "1.5版增加了百度分类词库bdict格式的转换，增加了命令行调用功能。\r\n";
         helpString += "1.6版修改了搜狗细胞词库解析和QQ手机词库解析的函数，支持最新格式。\r\n";
-        helpString += "1.7版增加了对QQ输入法分类词库(qpyd格式)的解析，可像搜狗细胞词库一样的将QQ分类词库导为文本了！\r\n";
-        helpString +=
-            "1.8版增加了自定义编码的输出，增强了命令行功能。实现了百度手机分类词库（bcd格式）、小小输入法和微软拼音输入法的词库功能，但是由于输入法的原因，MS拼音可能会导入失败。\r\n";
-        helpString +=
-            "1.9版增加了微软英库拼音输入法、FIT输入法、搜狗Bin格式备份词库、中州韵（小狼毫、鼠须管）、各种常用五笔输入法的支持，增加词库文件分割功能。\r\n";
-        helpString +=
-            "2.0版增加了简繁体转换功能、支持多种五笔、郑码、仓颉、注音、二笔等输入法词库、百度拼音PC版、灵格斯ld2格式等，增加对仓颉平台、雅虎奇摩输入法的支持。加强了Rime输入法和小小输入法\r\n";
-        helpString += "2.1版修复了自定义转换时的Bug，增加了超音速录、手心输入法等的支持。升级为.Net 3.5只要在Vista以上操作系统不需要安装.Net。";
-        helpString += "2.2支持手心输入法和最新版Win10微软拼音（用户自定义短语）\r\n";
-        helpString += "2.3支持Win10微软拼音（用户自定义短语）对其他输入法编码的支持\r\n";
-        helpString +=
-            "2.4版增加了最新搜狗输入法备份词库的解析，目前解析后只有词语和词频，没有拼音，所以拼音是根据词语重新生成的。（感谢GitHub上的h4x3rotab提供python版的解析算法，感谢tmxkn1提供了C#版的实现）\r\n";
-        helpString += "2.5版支持微软五笔，支持Linux和macOS和更多命令行功能\r\n";
-        helpString += "2.6版增加了对Emoji颜文字的支持，微软拼音自定义短语支持小鹤双拼编码\r\n";
-        helpString +=
-            "2.7版增加了对QQ拼音新细胞词库qcel格式的支持，增加了MacOS原生拼音自定义短语plist的支持。升级dotnet core到3.1。\r\n";
-        helpString += "2.8版增加了对微软拼音自学习词库的导入导出功能，增强了微软拼音自定义短语对双拼的支持，增加错误日志输出，启用新的CI和CD。\r\n";
+        helpString += "1.7版增加了QQ分类词库（qpyd格式）的转换，调整了下拉列表的顺序，增加了拖拽文件时的文件类型自动识别等功能。\r\n";
+        helpString += "1.8版增加了自定义编码的输出，增强了命令行功能。实现了百度手机分类词库（bcd格式）、小小输入法和微软拼音输入法的词库功能。\r\n";
+        helpString += "1.9版增加了微软英库拼音输入法、FIT输入法、搜狗Bin格式备份词库、中州韵（小狼毫、鼠须管）、各种常用五笔输入法的支持，增加词库文件分割功能。\r\n";
+        helpString += "2.0版支持多种编码的Rime输入法和小小输入法，增加了灵格斯ld2格式、简繁体转换、雅虎奇摩、仓颉平台支持，增强了五笔和郑码输入法支持。\r\n";
+        helpString += "2.1版修复了自定义导出Bug，增加了超音速写、手心输入法等支持，增加了批量转换一对一和词库合并功能。升级为.NET 3.5。\r\n";
+        helpString += "2.2版全面支持Win10微软拼音输入法词库导入导出。\r\n";
+        helpString += "2.3版增加了文件夹作为源的功能，支持将文件夹中所有词库文件批量转换。\r\n";
+        helpString += "2.4版增加了最新搜狗输入法备份词库的解析。\r\n";
+        helpString += "2.5版增加了Win10微软五笔支持，增加了Linux和macOS命令行模式。\r\n";
+        helpString += "2.6版增加了对Emoji颜文字的支持，微软拼音自定义短语支持小鹤双拼编码。\r\n";
+        helpString += "2.7版增加了QQ拼音新细胞词库qcel格式和MacOS原生拼音自定义短语plist支持。升级dotnet到3.1。\r\n";
+        helpString += "2.8版增加了微软拼音自学习词库的导入导出功能，增强双拼支持。\r\n";
         helpString += "2.9版增加了对GBoard手机输入法的词库导入导出功能。\r\n";
-        helpString += "3.0版增加了新世纪五笔的支持，并升级了依赖库版本和dotnet到6.0，修复了多个发现的Bug。\r\n";
-        helpString +=
-            "关于各种输入法的词库转换操作方法或提交新的Issue，请前往项目网站（https://github.com/studyzy/imewlconverter/）\r\n";
-        helpString +=
-            "如果您觉得深蓝词库转换能够给您的生活带来了极大的方便，可以通过微信或者支付宝捐赠该软件(https://github.com/studyzy/imewlconverter/wiki/Donate)。\r\n";
+        helpString += "3.0版增加了新世纪五笔的支持，升级dotnet到6.0。\r\n";
+        helpString += "3.1版增加了对rime userdb的支持，修复了搜狗备份词库解析问题，升级.NET到8.0。\r\n";
+        helpString += "3.2版增加了百度拼音备份词库、LibIME拼音词库的支持，修复搜狗细胞词库和微软自学习词汇索引溢出问题。\r\n";
+        helpString += "3.3版增加了macOS GUI应用（基于Avalonia UI），修复了自定义编码、Rime拼音码表、新世纪五笔生成器等问题。\r\n";
+        helpString += "3.4版升级.NET到10.0，支持导出搜狗细胞词库scel格式，增加LLM词频生成功能，重构命令行参数为GNU风格，增加集成测试框架，修复多个Bug。\r\n";
+        helpString += "\r\n";
+        helpString += "关于各种输入法的词库转换操作方法或提交新的Issue，请前往项目网站：\r\nhttps://github.com/studyzy/imewlconverter/\r\n\r\n";
         helpString += "有任何问题和建议请联系我：studyzy@163.com\r\n";
 
         richTextBox1.Text = helpString;
