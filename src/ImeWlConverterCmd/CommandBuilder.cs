@@ -254,25 +254,27 @@ public static class CommandBuilder
 
     private static void ShowSupportedFormats()
     {
-        var (imports, exports) = FormatRegistrar.RegisterAll();
+        var (imports, exports, names) = FormatRegistrar.RegisterAll();
 
         Console.WriteLine("支持的输入格式：");
         foreach (var kvp in imports.OrderBy(k => k.Key))
         {
-            Console.WriteLine($"  {kvp.Key,-15} {kvp.Value.GetType().Name}");
+            var displayName = names.TryGetValue(kvp.Key, out var n) ? n : kvp.Value.GetType().Name;
+            Console.WriteLine($"  {kvp.Key,-15} {displayName}");
         }
 
         Console.WriteLine();
         Console.WriteLine("支持的输出格式：");
         foreach (var kvp in exports.OrderBy(k => k.Key))
         {
-            Console.WriteLine($"  {kvp.Key,-15} {kvp.Value.GetType().Name}");
+            var displayName = names.TryGetValue(kvp.Key, out var n) ? n : kvp.Value.GetType().Name;
+            Console.WriteLine($"  {kvp.Key,-15} {displayName}");
         }
     }
 
     private static void ExecuteConversion(CommandLineOptions options)
     {
-        var (imports, exports) = FormatRegistrar.RegisterAll();
+        var (imports, exports, _) = FormatRegistrar.RegisterAll();
         var consoleRun = new ConsoleRun(imports, exports);
         consoleRun.Execute(options);
     }
