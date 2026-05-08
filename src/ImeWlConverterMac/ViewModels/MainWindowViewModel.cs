@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Controls;
@@ -200,51 +199,21 @@ public class MainWindowViewModel : ViewModelBase
 
     private void LoadImeList()
     {
-        var assembly = typeof(MainBody).Assembly;
-        var types = assembly.GetTypes();
-        var cbxImportItems = new List<ComboBoxShowAttribute>();
-        var cbxExportItems = new List<ComboBoxShowAttribute>();
+        var (imports, exports, sortedImportNames, sortedExportNames) = FormatRegistrar.RegisterAllForGui();
 
-        foreach (var type in types)
-        {
-            if (type.Namespace != null && type.Namespace.StartsWith("Studyzy.IMEWLConverter.IME"))
-            {
-                var att = type.GetCustomAttributes(typeof(ComboBoxShowAttribute), false);
-                if (att.Length > 0)
-                {
-                    var cbxa = att[0] as ComboBoxShowAttribute;
-                    if (cbxa != null)
-                    {
-                        if (type.GetInterface("IWordLibraryImport") != null)
-                        {
-                            cbxImportItems.Add(cbxa);
-                            var instance = assembly.CreateInstance(type.FullName!) as IWordLibraryImport;
-                            if (instance != null)
-                                _imports.Add(cbxa.Name, instance);
-                        }
+        foreach (var kvp in imports)
+            _imports.Add(kvp.Key, kvp.Value);
 
-                        if (type.GetInterface("IWordLibraryExport") != null)
-                        {
-                            cbxExportItems.Add(cbxa);
-                            var instance = assembly.CreateInstance(type.FullName!) as IWordLibraryExport;
-                            if (instance != null)
-                                _exports.Add(cbxa.Name, instance);
-                        }
-                    }
-                }
-            }
-        }
-
-        cbxImportItems.Sort((a, b) => a.Index - b.Index);
-        cbxExportItems.Sort((a, b) => a.Index - b.Index);
+        foreach (var kvp in exports)
+            _exports.Add(kvp.Key, kvp.Value);
 
         ImportTypes.Clear();
-        foreach (var item in cbxImportItems)
-            ImportTypes.Add(item.Name);
+        foreach (var name in sortedImportNames)
+            ImportTypes.Add(name);
 
         ExportTypes.Clear();
-        foreach (var item in cbxExportItems)
-            ExportTypes.Add(item.Name);
+        foreach (var name in sortedExportNames)
+            ExportTypes.Add(name);
     }
 
     private IWordLibraryImport GetImportInterface(string name)
