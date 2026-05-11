@@ -1,22 +1,24 @@
+using System.Text;
 using ImeWlConverter.Abstractions.Contracts;
 using ImeWlConverter.Abstractions.Enums;
 using ImeWlConverter.Abstractions.Models;
 using ImeWlConverter.Abstractions.Options;
 using ImeWlConverter.Abstractions.Results;
 using ImeWlConverter.Core.CodeGeneration;
+using ImeWlConverter.Core.Filters;
 
 namespace ImeWlConverter.Core.Pipeline;
 
 /// <summary>
 /// Orchestrates the complete conversion pipeline:
 /// Import → Filter → ChineseConvert → WordRank → CodeGen → RemoveEmpty → Export.
+/// Shared across CLI, WinForms GUI, and Mac GUI.
 /// </summary>
 public sealed class ConversionPipeline : IConversionPipeline
 {
     private readonly IEnumerable<IFormatImporter> _importers;
     private readonly IEnumerable<IFormatExporter> _exporters;
-    private readonly IProgress<ProgressInfo>? _progress;
-    private readonly FilterPipeline? _filterPipeline;
+    private readonly FilterPipeline? _externalFilterPipeline;
     private readonly IChineseConverter? _chineseConverter;
     private readonly IWordRankGenerator? _wordRankGenerator;
     private readonly CodeGenerationService? _codeGenerationService;
@@ -24,7 +26,6 @@ public sealed class ConversionPipeline : IConversionPipeline
     public ConversionPipeline(
         IEnumerable<IFormatImporter> importers,
         IEnumerable<IFormatExporter> exporters,
-        IProgress<ProgressInfo>? progress = null,
         FilterPipeline? filterPipeline = null,
         IChineseConverter? chineseConverter = null,
         IWordRankGenerator? wordRankGenerator = null,
@@ -32,8 +33,7 @@ public sealed class ConversionPipeline : IConversionPipeline
     {
         _importers = importers;
         _exporters = exporters;
-        _progress = progress;
-        _filterPipeline = filterPipeline;
+        _externalFilterPipeline = filterPipeline;
         _chineseConverter = chineseConverter;
         _wordRankGenerator = wordRankGenerator;
         _codeGenerationService = codeGenerationService;
@@ -42,6 +42,7 @@ public sealed class ConversionPipeline : IConversionPipeline
     /// <inheritdoc/>
     public async Task<Result<ConversionResult>> ExecuteAsync(
         ConversionRequest request,
+        IProgress<ProgressInfo>? progress = null,
         CancellationToken ct = default)
     {
         // 1. Find importer/exporter by format ID
@@ -53,36 +54,78 @@ public sealed class ConversionPipeline : IConversionPipeline
         if (exporter is null)
             return Result<ConversionResult>.Failure($"Unknown output format: {request.OutputFormatId}");
 
-        // 2. Import all input files
+        // Build filter pipeline
+        var filterPipeline = _externalFilterPipeline ?? BuildFilterPipeline(request.FilterConfig);
+
+        if (request.MergeToOneFile)
+        {
+            return await ExecuteMergedAsync(
+                request, importer, exporter, filterPipeline, progress, ct);
+        }
+        else
+        {
+            return await ExecutePerFileAsync(
+                request, importer, exporter, filterPipeline, progress, ct);
+        }
+    }
+
+    private async Task<Result<ConversionResult>> ExecuteMergedAsync(
+        ConversionRequest request,
+        IFormatImporter importer,
+        IFormatExporter exporter,
+        FilterPipeline? filterPipeline,
+        IProgress<ProgressInfo>? progress,
+        CancellationToken ct)
+    {
+        var errors = new StringBuilder();
+        var files = request.InputPaths;
+        var totalFiles = files.Count;
+
+        // Phase 1: Import all files
         var allEntries = new List<WordEntry>();
-        foreach (var inputPath in request.InputPaths)
+        for (var i = 0; i < totalFiles; i++)
         {
             ct.ThrowIfCancellationRequested();
-            _progress?.Report(new ProgressInfo(0, 0, $"Importing {Path.GetFileName(inputPath)}..."));
+            var fileName = Path.GetFileName(files[i]);
+            progress?.Report(new ProgressInfo(i + 1, totalFiles, $"正在导入文件 {i + 1}/{totalFiles}: {fileName}"));
 
-            using var stream = File.OpenRead(inputPath);
-            var importResult = await importer.ImportAsync(stream, request.Options.Import, ct);
-            allEntries.AddRange(importResult.Entries);
+            try
+            {
+                using var stream = File.OpenRead(files[i]);
+                var importResult = await importer.ImportAsync(stream, request.Options.Import, ct);
+                allEntries.AddRange(importResult.Entries);
+            }
+            catch (OperationCanceledException) { throw; }
+            catch (Exception ex)
+            {
+                errors.AppendLine($"导入 {files[i]} 失败: {ex.Message}");
+            }
         }
 
         var importedCount = allEntries.Count;
 
-        // 3. Filter (before code generation)
-        _progress?.Report(new ProgressInfo(0, 0, "Filtering..."));
-        IReadOnlyList<WordEntry> entries = _filterPipeline is not null
-            ? _filterPipeline.Apply(allEntries)
+        // Phase 2: Filter
+        ct.ThrowIfCancellationRequested();
+        progress?.Report(new ProgressInfo(0, importedCount, "正在过滤..."));
+        IReadOnlyList<WordEntry> entries = filterPipeline is not null
+            ? filterPipeline.Apply(allEntries)
             : allEntries;
 
-        // 4. Chinese conversion (simplified ↔ traditional)
+        // Phase 3: Chinese conversion
         entries = ApplyChineseConversion(entries, request.Options.ChineseConversion);
 
-        // 5. Word rank generation
-        entries = await ApplyWordRankGenerationAsync(entries, ct);
+        // Phase 4: Word rank generation
+        if (_wordRankGenerator is not null)
+        {
+            ct.ThrowIfCancellationRequested();
+            progress?.Report(new ProgressInfo(0, entries.Count, "正在生成词频..."));
+            entries = await _wordRankGenerator.GenerateRanksAsync(entries, ct);
+        }
 
-        // 6. Code generation (target encoding)
-        entries = ApplyCodeGeneration(entries, request.Options.CodeGeneration);
+        // Phase 5: Code generation
+        entries = ApplyCodeGeneration(entries, request.Options.CodeGeneration, progress);
 
-        // 7. Remove entries with empty code (when code generation was requested)
+        // Phase 6: Remove entries with empty code (when code generation was requested)
         if (_codeGenerationService is not null && request.Options.CodeGeneration.TargetCodeType != CodeType.NoCode)
         {
             entries = entries.Where(e => e.Code is not null && e.Code.Segments.Count > 0).ToList();
@@ -91,16 +134,104 @@ public sealed class ConversionPipeline : IConversionPipeline
         var exportedCount = entries.Count;
         var filteredCount = importedCount - exportedCount;
 
-        // 8. Export
-        _progress?.Report(new ProgressInfo(0, 0, "Exporting..."));
-        using var outputStream = File.Create(request.OutputPath);
-        await exporter.ExportAsync(entries, outputStream, request.Options.Export, ct);
+        // Phase 7: Export
+        ct.ThrowIfCancellationRequested();
+        progress?.Report(new ProgressInfo(exportedCount, exportedCount, $"正在导出 {exportedCount} 条词条..."));
+
+        string? exportContent = null;
+
+        if (request.OutputStream is not null)
+        {
+            // GUI mode: write to provided stream, capture content
+            await exporter.ExportAsync(entries, request.OutputStream, request.Options.Export, ct);
+            request.OutputStream.Position = 0;
+            using var reader = new StreamReader(request.OutputStream, leaveOpen: true);
+            exportContent = await reader.ReadToEndAsync(ct);
+        }
+        else if (request.OutputPath is not null)
+        {
+            // CLI/file mode: write directly to file
+            using var outputStream = File.Create(request.OutputPath);
+            await exporter.ExportAsync(entries, outputStream, request.Options.Export, ct);
+        }
+
+        var errorStr = errors.Length > 0 ? errors.ToString() : null;
 
         return Result<ConversionResult>.Success(new ConversionResult
         {
             ImportedCount = importedCount,
             ExportedCount = exportedCount,
-            FilteredCount = filteredCount
+            FilteredCount = filteredCount,
+            ExportContent = exportContent,
+            ErrorMessages = errorStr
+        });
+    }
+
+    private async Task<Result<ConversionResult>> ExecutePerFileAsync(
+        ConversionRequest request,
+        IFormatImporter importer,
+        IFormatExporter exporter,
+        FilterPipeline? filterPipeline,
+        IProgress<ProgressInfo>? progress,
+        CancellationToken ct)
+    {
+        var errors = new StringBuilder();
+        var files = request.InputPaths;
+        var totalFiles = files.Count;
+        var totalConverted = 0;
+        var totalImported = 0;
+
+        for (var i = 0; i < totalFiles; i++)
+        {
+            ct.ThrowIfCancellationRequested();
+            var file = files[i];
+            var fileName = Path.GetFileName(file);
+            progress?.Report(new ProgressInfo(i + 1, totalFiles, $"正在处理文件 {i + 1}/{totalFiles}: {fileName}"));
+
+            try
+            {
+                using var stream = File.OpenRead(file);
+                var importResult = await importer.ImportAsync(stream, request.Options.Import, ct);
+                totalImported += importResult.Entries.Count;
+
+                IReadOnlyList<WordEntry> fileEntries = filterPipeline is not null
+                    ? filterPipeline.Apply(importResult.Entries.ToList())
+                    : importResult.Entries.ToList();
+
+                fileEntries = ApplyChineseConversion(fileEntries, request.Options.ChineseConversion);
+
+                if (_wordRankGenerator is not null)
+                    fileEntries = await _wordRankGenerator.GenerateRanksAsync(fileEntries, ct);
+
+                fileEntries = ApplyCodeGeneration(fileEntries, request.Options.CodeGeneration, progress);
+
+                if (_codeGenerationService is not null && request.Options.CodeGeneration.TargetCodeType != CodeType.NoCode)
+                    fileEntries = fileEntries.Where(e => e.Code is not null && e.Code.Segments.Count > 0).ToList();
+
+                var outputFile = Path.Combine(
+                    request.OutputDirectory ?? ".",
+                    Path.GetFileNameWithoutExtension(file) + ".txt");
+                using var outStream = File.Create(outputFile);
+                await exporter.ExportAsync(fileEntries, outStream, request.Options.Export, ct);
+
+                totalConverted += fileEntries.Count;
+                progress?.Report(new ProgressInfo(i + 1, totalFiles, $"已导出: {outputFile}"));
+            }
+            catch (OperationCanceledException) { throw; }
+            catch (Exception ex)
+            {
+                errors.AppendLine($"处理 {file} 失败: {ex.Message}");
+            }
+        }
+
+        var errorStr = errors.Length > 0 ? errors.ToString() : null;
+
+        return Result<ConversionResult>.Success(new ConversionResult
+        {
+            ImportedCount = totalImported,
+            ExportedCount = totalConverted,
+            FilteredCount = totalImported - totalConverted,
+            ErrorMessages = errorStr
         });
     }
 
@@ -127,22 +258,60 @@ public sealed class ConversionPipeline : IConversionPipeline
         return result;
     }
 
-    private async Task<IReadOnlyList<WordEntry>> ApplyWordRankGenerationAsync(
-        IReadOnlyList<WordEntry> entries, CancellationToken ct)
-    {
-        if (_wordRankGenerator is null)
-            return entries;
-
-        return await _wordRankGenerator.GenerateRanksAsync(entries, ct);
-    }
-
     private IReadOnlyList<WordEntry> ApplyCodeGeneration(
-        IReadOnlyList<WordEntry> entries, CodeGenerationOptions options)
+        IReadOnlyList<WordEntry> entries, CodeGenerationOptions options,
+        IProgress<ProgressInfo>? progress)
     {
         if (_codeGenerationService is null || options.TargetCodeType == CodeType.NoCode)
             return entries;
 
-        _progress?.Report(new ProgressInfo(0, entries.Count, "Generating codes..."));
-        return _codeGenerationService.GenerateCodes(entries, options.TargetCodeType, _progress);
+        progress?.Report(new ProgressInfo(0, entries.Count, "正在生成编码..."));
+        return _codeGenerationService.GenerateCodes(entries, options.TargetCodeType, progress);
+    }
+
+    /// <summary>
+    /// Build a FilterPipeline from FilterConfig.
+    /// </summary>
+    private static FilterPipeline? BuildFilterPipeline(FilterConfig? config)
+    {
+        if (config is null || config.NoFilter) return null;
+
+        var filters = new List<IWordFilter>();
+        var transforms = new List<IWordTransform>();
+        var batchFilters = new List<IBatchFilter>();
+
+        // Single-entry filters
+        if (config.IgnoreEnglish) filters.Add(new EnglishFilter());
+        if (config.IgnoreFirstCJK) filters.Add(new FirstCJKFilter());
+        if (config.WordLengthFrom > 1 || config.WordLengthTo < 9999)
+            filters.Add(new LengthFilter { MinLength = config.WordLengthFrom, MaxLength = config.WordLengthTo });
+        if (config.WordRankFrom > 1 || config.WordRankTo < 999999)
+            filters.Add(new RankFilter { MinRank = config.WordRankFrom, MaxRank = config.WordRankTo });
+        if (config.IgnoreSpace) filters.Add(new SpaceFilter());
+        if (config.IgnorePunctuation)
+        {
+            filters.Add(new ChinesePunctuationFilter());
+            filters.Add(new EnglishPunctuationFilter());
+        }
+        if (config.IgnoreNumber) filters.Add(new NumberFilter());
+        if (config.IgnoreNoAlphabetCode) filters.Add(new NoAlphabetCodeFilter());
+
+        // Transforms
+        if (config.ReplaceEnglish) transforms.Add(new EnglishRemoveTransform());
+        if (config.ReplacePunctuation)
+        {
+            transforms.Add(new EnglishPunctuationRemoveTransform());
+            transforms.Add(new ChinesePunctuationRemoveTransform());
+        }
+        if (config.ReplaceSpace) transforms.Add(new SpaceRemoveTransform());
+        if (config.ReplaceNumber) transforms.Add(new NumberRemoveTransform());
+
+        // Batch filters
+        if (config.WordRankPercentage < 100)
+            batchFilters.Add(new RankPercentageFilter { Percentage = config.WordRankPercentage });
+
+        return filters.Count == 0 && transforms.Count == 0 && batchFilters.Count == 0
+            ? null
+            : new FilterPipeline(filters, transforms, batchFilters);
     }
 }

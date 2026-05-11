@@ -4,8 +4,11 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using ImeWlConverter.Core;
+using ImeWlConverter.Formats;
 using ImeWlConverterMac.ViewModels;
 using ImeWlConverterMac.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ImeWlConverterMac;
 
@@ -20,7 +23,13 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var viewModel = new MainWindowViewModel();
+            // Build DI container (shared with CLI and WinForms)
+            var services = new ServiceCollection();
+            services.AddAllFormats();
+            services.AddImeWlConverterCore();
+            var serviceProvider = services.BuildServiceProvider();
+
+            var viewModel = new MainWindowViewModel(serviceProvider);
 
             var mainWindow = new MainWindow
             {

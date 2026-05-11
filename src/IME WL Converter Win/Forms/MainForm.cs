@@ -29,14 +29,13 @@ using ImeWlConverter.Abstractions.Options;
 using ImeWlConverter.Core.Helpers;
 using ImeWlConverter.Core.WordRank;
 using Microsoft.Extensions.DependencyInjection;
-using Studyzy.IMEWLConverter.Services;
 
 namespace Studyzy.IMEWLConverter;
 
 public partial class MainForm : Form
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly IConversionOrchestrator _conversionService;
+    private readonly IConversionPipeline _pipeline;
     private readonly IDictionary<string, IFormatImporter> _importers = new Dictionary<string, IFormatImporter>();
     private readonly IDictionary<string, IFormatExporter> _exporters = new Dictionary<string, IFormatExporter>();
 
@@ -52,7 +51,7 @@ public partial class MainForm : Form
     private string outputDir = "";
     private int _convertedCount;
 
-    private IReadOnlyList<string>? _exportContents;
+    private string? _exportContent;
 
     private CancellationTokenSource? _cts;
 
@@ -65,7 +64,7 @@ public partial class MainForm : Form
         InitializeComponent();
         LoadTitle();
         _serviceProvider = serviceProvider;
-        _conversionService = serviceProvider.GetRequiredService<IConversionOrchestrator>();
+        _pipeline = serviceProvider.GetRequiredService<IConversionPipeline>();
         _wordRankGenerator = serviceProvider.GetRequiredService<IWordRankGenerator>();
     }
 
@@ -296,32 +295,44 @@ public partial class MainForm : Form
         }
 
         richTextBox1.Clear();
-        _exportContents = null;
+        _exportContent = null;
         _cts = new CancellationTokenSource();
         SetConvertingState(true);
 
-        var request = new WinConversionRequest
+        var outputStream = mergeTo1File ? new MemoryStream() : null;
+
+        var request = new ConversionRequest
         {
-            Importer = _selectedImporter!,
-            Exporter = _selectedExporter!,
-            InputFiles = FileOperationHelper.GetFilesPath(txbWLPath.Text).ToList(),
-            FilterConfig = filterConfig,
-            ChineseConversion = _chineseConversionMode,
-            WordRankGenerator = _wordRankGenerator,
+            InputFormatId = _selectedImporter!.Metadata.Id,
+            OutputFormatId = _selectedExporter!.Metadata.Id,
+            InputPaths = FileOperationHelper.GetFilesPath(txbWLPath.Text).ToList(),
+            OutputPath = streamExport ? exportPath : null,
+            OutputStream = outputStream,
             MergeToOneFile = mergeTo1File,
             OutputDirectory = outputDir,
-            StreamExport = streamExport,
-            StreamExportPath = exportPath,
+            FilterConfig = filterConfig,
+            Options = new ConversionOptions
+            {
+                ChineseConversion = _chineseConversionMode
+            }
         };
 
         var progress = new Progress<ProgressInfo>(OnProgressReported);
 
         try
         {
-            var result = await _conversionService.ConvertAsync(request, progress, _cts.Token);
-            _convertedCount = result.ConvertedCount;
-            _exportContents = result.ExportLines;
-            HandleConversionCompleted(result);
+            var result = await _pipeline.ExecuteAsync(request, progress, _cts.Token);
+            if (result.IsSuccess)
+            {
+                _convertedCount = result.Value.ExportedCount;
+                _exportContent = result.Value.ExportContent;
+                HandleConversionCompleted(result.Value);
+            }
+            else
+            {
+                MessageBox.Show("转换失败：" + result.Error, "出错",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         catch (OperationCanceledException)
         {
@@ -334,6 +345,7 @@ public partial class MainForm : Form
         }
         finally
         {
+            outputStream?.Dispose();
             SetConvertingState(false);
             _cts?.Dispose();
             _cts = null;
@@ -383,12 +395,12 @@ public partial class MainForm : Form
         ShowStatusMessage("正在取消...", false);
     }
 
-    private void HandleConversionCompleted(WinConversionResult result)
+    private void HandleConversionCompleted(ConversionResult result)
     {
         toolStripProgressBar1.Value = toolStripProgressBar1.Maximum;
         ShowStatusMessage("转换完成", false);
 
-        if (result.ErrorMessages.Length > 0)
+        if (!string.IsNullOrEmpty(result.ErrorMessages))
         {
             var errForm = new ErrorLogForm(result.ErrorMessages);
             errForm.ShowDialog();
@@ -410,16 +422,15 @@ public partial class MainForm : Form
             richTextBox1.Text =
                 "为提高处理速度，\u201c高级设置\u201d中选中了\u201c不显示结果，直接导出\u201d，本文本框中不显示转换后的结果，若要查看转换后的结果再确定是否保存请取消该设置。";
         }
-        else if (_exportContents != null)
+        else if (_exportContent != null)
         {
-            var dataText = string.Join("\r\n", _exportContents);
-            if (toolStripMenuItemShowLess.Checked && dataText.Length > 200000)
+            if (toolStripMenuItemShowLess.Checked && _exportContent.Length > 200000)
                 richTextBox1.Text =
                     "为避免输出时卡死，\u201c高级设置\u201d中选中了\u201c结果只显示首、末10万字\u201d，本文本框中不显示转换后的全部结果，若要查看转换后的结果再确定是否保存请取消该设置。\n\n"
-                    + dataText.Substring(0, 100000)
+                    + _exportContent.Substring(0, 100000)
                     + "\n\n\n...\n\n\n"
-                    + dataText.Substring(dataText.Length - 100000);
-            else if (dataText.Length > 0) richTextBox1.Text = dataText;
+                    + _exportContent.Substring(_exportContent.Length - 100000);
+            else if (_exportContent.Length > 0) richTextBox1.Text = _exportContent;
         }
 
         if (_convertedCount > 0)
@@ -439,9 +450,9 @@ public partial class MainForm : Form
 
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                if (_exportContents != null)
+                if (_exportContent != null)
                 {
-                    File.WriteAllText(saveFileDialog1.FileName, string.Join("\r\n", _exportContents));
+                    File.WriteAllText(saveFileDialog1.FileName, _exportContent);
                 }
 
                 ShowStatusMessage("保存成功，词库路径：" + saveFileDialog1.FileName, true);

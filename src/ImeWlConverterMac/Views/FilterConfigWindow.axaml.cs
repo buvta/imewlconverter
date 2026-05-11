@@ -1,45 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using ImeWlConverter.Abstractions.Options;
 
 namespace ImeWlConverterMac.Views;
-
-/// <summary>
-/// GUI 过滤配置数据类（暂存 UI 状态，后续接入新管道的 FilterPipeline）
-/// </summary>
-public class FilterConfig
-{
-    public int WordLengthFrom { get; set; } = 1;
-    public int WordLengthTo { get; set; } = 9999;
-    public int WordRankFrom { get; set; } = 1;
-    public int WordRankTo { get; set; } = 999999;
-    public int WordRankPercentage { get; set; } = 100;
-
-    public bool IgnoreEnglish { get; set; }
-    public bool IgnoreSpace { get; set; }
-    public bool IgnorePunctuation { get; set; }
-    public bool IgnoreNumber { get; set; }
-    public bool IgnoreNoAlphabetCode { get; set; }
-    public bool NoFilter { get; set; } = true;
-    public bool IgnoreFirstCJK { get; set; }
-
-    public bool ReplaceEnglish { get; set; }
-    public bool ReplaceNumber { get; set; }
-    public bool ReplacePunctuation { get; set; }
-    public bool ReplaceSpace { get; set; }
-
-    public bool KeepEnglish { get; set; }
-    public bool KeepNumber { get; set; }
-    public bool KeepPunctuation { get; set; }
-    public bool KeepSpace { get; set; }
-    public bool KeepEnglish_ { get; set; }
-    public bool KeepNumber_ { get; set; }
-    public bool KeepPunctuation_ { get; set; }
-    public bool KeepSpace_ { get; set; }
-
-    public bool FullWidth { get; set; }
-    public bool ChsNumber { get; set; }
-    public bool PrefixEnglish { get; set; }
-}
 
 public partial class FilterConfigWindow : Window
 {
@@ -55,7 +18,26 @@ public partial class FilterConfigWindow : Window
     public FilterConfigWindow(FilterConfig filterConfig)
     {
         InitializeComponent();
-        FilterConfig = filterConfig;
+        // Clone to avoid modifying the original on cancel
+        FilterConfig = new FilterConfig
+        {
+            NoFilter = filterConfig.NoFilter,
+            WordLengthFrom = filterConfig.WordLengthFrom,
+            WordLengthTo = filterConfig.WordLengthTo,
+            WordRankFrom = filterConfig.WordRankFrom,
+            WordRankTo = filterConfig.WordRankTo,
+            WordRankPercentage = filterConfig.WordRankPercentage,
+            IgnoreEnglish = filterConfig.IgnoreEnglish,
+            IgnoreNumber = filterConfig.IgnoreNumber,
+            IgnoreSpace = filterConfig.IgnoreSpace,
+            IgnorePunctuation = filterConfig.IgnorePunctuation,
+            IgnoreNoAlphabetCode = filterConfig.IgnoreNoAlphabetCode,
+            IgnoreFirstCJK = filterConfig.IgnoreFirstCJK,
+            ReplaceEnglish = filterConfig.ReplaceEnglish,
+            ReplaceNumber = filterConfig.ReplaceNumber,
+            ReplaceSpace = filterConfig.ReplaceSpace,
+            ReplacePunctuation = filterConfig.ReplacePunctuation,
+        };
         LoadConfig();
     }
 
@@ -80,18 +62,18 @@ public partial class FilterConfigWindow : Window
         cbxReplacePunctuation.IsChecked = FilterConfig.ReplacePunctuation;
         cbxReplaceSpace.IsChecked = FilterConfig.ReplaceSpace;
 
-        cbxKeepEnglish.IsChecked = FilterConfig.KeepEnglish;
-        cbxKeepNumber.IsChecked = FilterConfig.KeepNumber;
-        cbxKeepPunctuation.IsChecked = FilterConfig.KeepPunctuation;
-        cbxKeepSpace.IsChecked = FilterConfig.KeepSpace;
-        cbxKeepEnglish_.IsChecked = FilterConfig.KeepEnglish_;
-        cbxKeepNumber_.IsChecked = FilterConfig.KeepNumber_;
-        cbxKeepPunctuation_.IsChecked = FilterConfig.KeepPunctuation_;
-        cbxKeepSpace_.IsChecked = FilterConfig.KeepSpace_;
+        cbxKeepEnglish.IsChecked = false;
+        cbxKeepNumber.IsChecked = false;
+        cbxKeepPunctuation.IsChecked = false;
+        cbxKeepSpace.IsChecked = false;
+        cbxKeepEnglish_.IsChecked = false;
+        cbxKeepNumber_.IsChecked = false;
+        cbxKeepPunctuation_.IsChecked = false;
+        cbxKeepSpace_.IsChecked = false;
 
-        cbxFullWidth.IsChecked = FilterConfig.FullWidth;
-        cbxChsNumber.IsChecked = FilterConfig.ChsNumber;
-        cbxPrefixEnglish.IsChecked = FilterConfig.PrefixEnglish;
+        cbxFullWidth.IsChecked = false;
+        cbxChsNumber.IsChecked = false;
+        cbxPrefixEnglish.IsChecked = false;
     }
 
     private void BtnOK_Click(object? sender, RoutedEventArgs e)
@@ -114,19 +96,6 @@ public partial class FilterConfigWindow : Window
         FilterConfig.ReplaceEnglish = cbxReplaceEnglish.IsChecked ?? false;
         FilterConfig.ReplaceSpace = cbxReplaceSpace.IsChecked ?? false;
         FilterConfig.ReplacePunctuation = cbxReplacePunctuation.IsChecked ?? false;
-
-        FilterConfig.KeepEnglish = cbxKeepEnglish.IsChecked ?? false;
-        FilterConfig.KeepNumber = cbxKeepNumber.IsChecked ?? false;
-        FilterConfig.KeepPunctuation = cbxKeepPunctuation.IsChecked ?? false;
-        FilterConfig.KeepSpace = cbxKeepSpace.IsChecked ?? false;
-        FilterConfig.KeepEnglish_ = cbxKeepEnglish_.IsChecked ?? false;
-        FilterConfig.KeepNumber_ = cbxKeepNumber_.IsChecked ?? false;
-        FilterConfig.KeepPunctuation_ = cbxKeepPunctuation_.IsChecked ?? false;
-        FilterConfig.KeepSpace_ = cbxKeepSpace_.IsChecked ?? false;
-
-        FilterConfig.FullWidth = cbxFullWidth.IsChecked ?? false;
-        FilterConfig.ChsNumber = cbxChsNumber.IsChecked ?? false;
-        FilterConfig.PrefixEnglish = cbxPrefixEnglish.IsChecked ?? false;
 
         Close(true);
     }

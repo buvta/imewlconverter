@@ -20,7 +20,6 @@ using System.Windows.Forms;
 using ImeWlConverter.Core;
 using ImeWlConverter.Formats;
 using Microsoft.Extensions.DependencyInjection;
-using Studyzy.IMEWLConverter.Services;
 
 namespace Studyzy.IMEWLConverter;
 
@@ -36,7 +35,6 @@ internal static class Program
         var services = new ServiceCollection();
         services.AddAllFormats();
         services.AddImeWlConverterCore();
-        services.AddSingleton<IConversionOrchestrator, ConversionService>();
         var serviceProvider = services.BuildServiceProvider();
 
         Application.Run(new MainForm(serviceProvider));

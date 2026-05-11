@@ -17,64 +17,26 @@
 
 using System;
 using System.Windows.Forms;
+using ImeWlConverter.Abstractions.Options;
 
 namespace Studyzy.IMEWLConverter;
-
-/// <summary>
-/// Local filter configuration DTO for Win GUI.
-/// </summary>
-public class FilterConfig
-{
-    public FilterConfig()
-    {
-        WordLengthFrom = 1;
-        WordLengthTo = 100;
-        WordRankFrom = 1;
-        WordRankTo = 999999;
-        WordRankPercentage = 100;
-        IgnoreFirstCJK = true;
-        KeepSpace_ = true;
-        KeepSpace = true;
-        NoFilter = false;
-        KeepEnglish = true;
-        KeepNumber_ = true;
-        PrefixEnglish = true;
-        KeepPunctuation_ = true;
-        FullWidth = true;
-    }
-
-    public bool NoFilter { get; set; }
-    public bool KeepEnglish { get; set; }
-    public int WordLengthFrom { get; set; }
-    public int WordLengthTo { get; set; }
-    public int WordRankFrom { get; set; }
-    public int WordRankTo { get; set; }
-    public int WordRankPercentage { get; set; }
-    public bool IgnoreEnglish { get; set; }
-    public bool IgnoreNumber { get; set; }
-    public bool IgnoreSpace { get; set; }
-    public bool IgnorePunctuation { get; set; }
-    public bool IgnoreNoAlphabetCode { get; set; }
-    public bool ReplaceNumber { get; set; }
-    public bool ReplaceEnglish { get; set; }
-    public bool ReplaceSpace { get; set; }
-    public bool ReplacePunctuation { get; set; }
-    public bool KeepNumber { get; set; }
-    public bool IgnoreFirstCJK { get; set; }
-    public bool KeepNumber_ { get; set; }
-    public bool KeepEnglish_ { get; set; }
-    public bool KeepPunctuation { get; set; }
-    public bool KeepPunctuation_ { get; set; }
-    public bool FullWidth { get; set; }
-    public bool ChsNumber { get; set; }
-    public bool PrefixEnglish { get; set; }
-    public bool KeepSpace_ { get; set; }
-    public bool KeepSpace { get; set; }
-}
 
 public partial class FilterConfigForm : Form
 {
     private static FilterConfig filterConfig = new();
+
+    // UI-only state (not used by conversion pipeline)
+    private static bool _keepEnglish = true;
+    private static bool _keepNumber;
+    private static bool _keepPunctuation;
+    private static bool _keepSpace;
+    private static bool _keepEnglishAlt;
+    private static bool _keepNumberAlt = true;
+    private static bool _keepPunctuationAlt = true;
+    private static bool _keepSpaceAlt = true;
+    private static bool _fullWidth = true;
+    private static bool _chsNumber;
+    private static bool _prefixEnglish = true;
 
     public FilterConfigForm()
     {
@@ -102,23 +64,20 @@ public partial class FilterConfigForm : Form
         filterConfig.ReplaceSpace = cbxReplaceSpace.Checked;
         filterConfig.ReplacePunctuation = cbxReplacePunctuation.Checked;
 
-        filterConfig.KeepEnglish = cbxKeepEnglish.Checked;
-        filterConfig.KeepNumber = cbxKeepNumber.Checked;
-        filterConfig.KeepPunctuation = cbxKeepPunctuation.Checked;
-
-        filterConfig.KeepEnglish_ = cbxKeepEnglish_.Checked;
-        filterConfig.KeepNumber_ = cbxKeepNumber_.Checked;
-
-        filterConfig.KeepPunctuation_ = cbxKeepPunctuation_.Checked;
-
-        filterConfig.FullWidth = cbxFullWidth.Checked;
-        filterConfig.ChsNumber = cbxChsNumber.Checked;
-        filterConfig.PrefixEnglish = cbxPrefixEnglish.Checked;
-
         filterConfig.IgnoreFirstCJK = cbxFilterFirstCJK.Checked;
 
-        filterConfig.KeepSpace_ = cbxKeepSpace_.Checked;
-        filterConfig.KeepSpace = cbxKeepSpace.Checked;
+        // UI-only state
+        _keepEnglish = cbxKeepEnglish.Checked;
+        _keepNumber = cbxKeepNumber.Checked;
+        _keepPunctuation = cbxKeepPunctuation.Checked;
+        _keepEnglishAlt = cbxKeepEnglish_.Checked;
+        _keepNumberAlt = cbxKeepNumber_.Checked;
+        _keepPunctuationAlt = cbxKeepPunctuation_.Checked;
+        _fullWidth = cbxFullWidth.Checked;
+        _chsNumber = cbxChsNumber.Checked;
+        _prefixEnglish = cbxPrefixEnglish.Checked;
+        _keepSpaceAlt = cbxKeepSpace_.Checked;
+        _keepSpace = cbxKeepSpace.Checked;
 
         DialogResult = DialogResult.OK;
     }
@@ -140,18 +99,20 @@ public partial class FilterConfigForm : Form
         cbxReplacePunctuation.Checked = filterConfig.ReplacePunctuation;
         cbxReplaceSpace.Checked = filterConfig.ReplaceSpace;
         cbxFilterNoAlphabetCode.Checked = filterConfig.IgnoreNoAlphabetCode;
-        cbxKeepEnglish.Checked = filterConfig.KeepEnglish;
-        cbxKeepNumber.Checked = filterConfig.KeepNumber;
-        cbxKeepEnglish_.Checked = filterConfig.KeepEnglish_;
-        cbxKeepNumber_.Checked = filterConfig.KeepNumber_;
         cbxFilterFirstCJK.Checked = filterConfig.IgnoreFirstCJK;
-        cbxKeepPunctuation.Checked = filterConfig.KeepPunctuation;
-        cbxKeepPunctuation_.Checked = filterConfig.KeepPunctuation_;
-        cbxFullWidth.Checked = filterConfig.FullWidth;
-        cbxChsNumber.Checked = filterConfig.ChsNumber;
-        cbxPrefixEnglish.Checked = filterConfig.PrefixEnglish;
-        cbxKeepSpace_.Checked = filterConfig.KeepSpace_;
-        cbxKeepSpace.Checked = filterConfig.KeepSpace;
+
+        // UI-only state
+        cbxKeepEnglish.Checked = _keepEnglish;
+        cbxKeepNumber.Checked = _keepNumber;
+        cbxKeepEnglish_.Checked = _keepEnglishAlt;
+        cbxKeepNumber_.Checked = _keepNumberAlt;
+        cbxKeepPunctuation.Checked = _keepPunctuation;
+        cbxKeepPunctuation_.Checked = _keepPunctuationAlt;
+        cbxFullWidth.Checked = _fullWidth;
+        cbxChsNumber.Checked = _chsNumber;
+        cbxPrefixEnglish.Checked = _prefixEnglish;
+        cbxKeepSpace_.Checked = _keepSpaceAlt;
+        cbxKeepSpace.Checked = _keepSpace;
     }
 
     private void cbxKeepNumber_CheckedChanged(object sender, EventArgs e)

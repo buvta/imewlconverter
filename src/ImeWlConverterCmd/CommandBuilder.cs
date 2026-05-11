@@ -188,7 +188,6 @@ public static class CommandBuilder
         var pipeline = new ConversionPipeline(
             importers,
             exporters,
-            progress: new ConsoleProgress(),
             filterPipeline: filterPipeline,
             chineseConverter: sp.GetService<IChineseConverter>(),
             wordRankGenerator: sp.GetService<IWordRankGenerator>(),
@@ -206,7 +205,7 @@ public static class CommandBuilder
             }
         };
 
-        var result = pipeline.ExecuteAsync(request).GetAwaiter().GetResult();
+        var result = pipeline.ExecuteAsync(request, new ConsoleProgress()).GetAwaiter().GetResult();
         if (!result.IsSuccess)
             throw new InvalidOperationException(result.Error);
 
