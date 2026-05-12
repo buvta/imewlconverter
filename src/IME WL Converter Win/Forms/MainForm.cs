@@ -299,7 +299,7 @@ public partial class MainForm : Form
         _cts = new CancellationTokenSource();
         SetConvertingState(true);
 
-        var outputStream = mergeTo1File ? new MemoryStream() : null;
+        var outputStream = (mergeTo1File && !streamExport) ? new MemoryStream() : null;
 
         var request = new ConversionRequest
         {

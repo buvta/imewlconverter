@@ -13,7 +13,7 @@ public sealed class RankPercentageFilter : IBatchFilter
             return entries;
 
         var count = entries.Count * Percentage / 100;
-        var sorted = entries.OrderBy(e => e.Rank).ToList();
+        var sorted = entries.OrderByDescending(e => e.Rank).ToList();
         return sorted.Take(count).ToList();
     }
 }

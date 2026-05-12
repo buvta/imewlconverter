@@ -9,10 +9,6 @@ using ImeWlConverter.Abstractions.Enums;
 using ImeWlConverter.Abstractions.Models;
 using ImeWlConverter.Abstractions.Options;
 using ImeWlConverter.Core;
-using ImeWlConverter.Core.CodeGeneration;
-using ImeWlConverter.Core.Filters;
-using ImeWlConverter.Core.Pipeline;
-using ImeWlConverter.Core.WordRank;
 using ImeWlConverter.Formats;
 using ImeWlConverter.Formats.SelfDefining;
 using Microsoft.Extensions.DependencyInjection;
@@ -166,7 +162,7 @@ public static class CommandBuilder
     {
         using var sp = BuildServiceProvider();
 
-        var filterPipeline = ParseFilterPipeline(filter);
+        var filterConfig = ParseFilterConfig(filter);
         var targetCodeType = ParseCodeType(codeType);
 
         var importers = sp.GetServices<IFormatImporter>().ToList();
@@ -185,13 +181,7 @@ public static class CommandBuilder
         if (targetCodeType == CodeType.NoCode)
             targetCodeType = InferCodeTypeFromOutputFormat(outputFormat, customFormat);
 
-        var pipeline = new ConversionPipeline(
-            importers,
-            exporters,
-            filterPipeline: filterPipeline,
-            chineseConverter: sp.GetService<IChineseConverter>(),
-            wordRankGenerator: sp.GetService<IWordRankGenerator>(),
-            codeGenerationService: sp.GetService<CodeGenerationService>());
+        var pipeline = sp.GetRequiredService<IConversionPipeline>();
 
         var request = new ConversionRequest
         {
@@ -199,6 +189,7 @@ public static class CommandBuilder
             OutputFormatId = outputFormat,
             InputPaths = inputFiles,
             OutputPath = outputPath,
+            FilterConfig = filterConfig,
             Options = new ConversionOptions
             {
                 CodeGeneration = new CodeGenerationOptions { TargetCodeType = targetCodeType }
@@ -238,46 +229,33 @@ public static class CommandBuilder
         exporter.ShowRank = spec.Length > 8 && spec[8] == 'y';
     }
 
-    private static FilterPipeline? ParseFilterPipeline(string? filterStr)
+    private static FilterConfig? ParseFilterConfig(string? filterStr)
     {
         if (string.IsNullOrEmpty(filterStr)) return null;
 
-        var filters = new List<IWordFilter>();
-        var transforms = new List<IWordTransform>();
+        var config = new FilterConfig();
 
         foreach (var part in filterStr.Split('|'))
         {
             if (part.StartsWith("len:"))
             {
                 var range = part[4..].Split('-');
-                filters.Add(new LengthFilter
-                {
-                    MinLength = int.Parse(range[0]),
-                    MaxLength = range.Length > 1 ? int.Parse(range[1]) : 9999
-                });
+                config.WordLengthFrom = int.Parse(range[0]);
+                config.WordLengthTo = range.Length > 1 ? int.Parse(range[1]) : 9999;
             }
             else if (part.StartsWith("rank:"))
             {
                 var range = part[5..].Split('-');
-                filters.Add(new RankFilter
-                {
-                    MinRank = int.Parse(range[0]),
-                    MaxRank = range.Length > 1 ? int.Parse(range[1]) : 999999
-                });
+                config.WordRankFrom = int.Parse(range[0]);
+                config.WordRankTo = range.Length > 1 ? int.Parse(range[1]) : 999999;
             }
-            else if (part == "rm:eng") filters.Add(new EnglishFilter());
-            else if (part == "rm:num") filters.Add(new NumberFilter());
-            else if (part == "rm:space") filters.Add(new SpaceFilter());
-            else if (part == "rm:pun")
-            {
-                filters.Add(new ChinesePunctuationFilter());
-                filters.Add(new EnglishPunctuationFilter());
-            }
+            else if (part == "rm:eng") config.IgnoreEnglish = true;
+            else if (part == "rm:num") config.IgnoreNumber = true;
+            else if (part == "rm:space") config.IgnoreSpace = true;
+            else if (part == "rm:pun") config.IgnorePunctuation = true;
         }
 
-        return filters.Count == 0 && transforms.Count == 0
-            ? null
-            : new FilterPipeline(filters, transforms);
+        return config;
     }
 
     private static CodeType InferCodeTypeFromOutputFormat(string outputFormat, string? customFormat)

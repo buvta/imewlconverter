@@ -22,7 +22,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ConversionPipeline>();
         services.AddSingleton<IConversionPipeline>(sp => sp.GetRequiredService<ConversionPipeline>());
         services.AddSingleton<CodeGenerationService>();
-        services.AddSingleton<FilterPipeline>();
 
         // Chinese converter
         services.AddSingleton<IChineseConverter, ChineseConverter>();

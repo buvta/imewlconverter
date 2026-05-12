@@ -18,7 +18,6 @@ public sealed class ConversionPipeline : IConversionPipeline
 {
     private readonly IEnumerable<IFormatImporter> _importers;
     private readonly IEnumerable<IFormatExporter> _exporters;
-    private readonly FilterPipeline? _externalFilterPipeline;
     private readonly IChineseConverter? _chineseConverter;
     private readonly IWordRankGenerator? _wordRankGenerator;
     private readonly CodeGenerationService? _codeGenerationService;
@@ -26,14 +25,12 @@ public sealed class ConversionPipeline : IConversionPipeline
     public ConversionPipeline(
         IEnumerable<IFormatImporter> importers,
         IEnumerable<IFormatExporter> exporters,
-        FilterPipeline? filterPipeline = null,
         IChineseConverter? chineseConverter = null,
         IWordRankGenerator? wordRankGenerator = null,
         CodeGenerationService? codeGenerationService = null)
     {
         _importers = importers;
         _exporters = exporters;
-        _externalFilterPipeline = filterPipeline;
         _chineseConverter = chineseConverter;
         _wordRankGenerator = wordRankGenerator;
         _codeGenerationService = codeGenerationService;
@@ -54,8 +51,8 @@ public sealed class ConversionPipeline : IConversionPipeline
         if (exporter is null)
             return Result<ConversionResult>.Failure($"Unknown output format: {request.OutputFormatId}");
 
-        // Build filter pipeline
-        var filterPipeline = _externalFilterPipeline ?? BuildFilterPipeline(request.FilterConfig);
+        // Build filter pipeline from request config
+        var filterPipeline = BuildFilterPipeline(request.FilterConfig);
 
         if (request.MergeToOneFile)
         {

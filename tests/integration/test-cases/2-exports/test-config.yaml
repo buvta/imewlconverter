@@ -216,6 +216,23 @@ test_cases:
     source: 唐诗300首前200词条
 
 
+- name: E18-CSV到搜狗scel词库
+  description: 测试导出为搜狗细胞词库scel二进制格式（RoundTrip验证在单元测试中）
+  enabled: true
+  timeout: 15
+  expect_failure: false
+  input:
+    file: source/source-data-csv.txt
+    format: self
+    encoding: UTF-8
+  output:
+    format: scel
+  tags:
+  - binary
+  - sougou
+  stats:
+    words: 200
+    source: 唐诗300首前200词条
 
 
 - name: E17-CSV到行列30自定义编码

@@ -85,7 +85,7 @@ public sealed partial class Win10MsPinyinSelfStudyImporter : BinaryFormatImporte
         return results;
     }
 
-    private static readonly string[] PinyinTable =
+    internal static readonly string[] PinyinTable =
     {
         "a", "ai", "an", "ang", "ao",
         "ba", "bai", "ban", "bang", "bao", "bei", "ben", "beng", "bi", "bian",
